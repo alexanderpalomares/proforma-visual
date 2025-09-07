@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================= */
+/* Estilos para exportar PDF */
+/* ========================= */
+
+/* ====== Impresión A4 (una sola página) ====== */
+@page {
+  size: A4;              /* 210mm × 297mm */
+  margin: 10mm;          /* ajusta 8–12mm si lo prefieres */
+}
+
+@media print {
+  html, body {
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  table, thead, tbody, tr, td, th {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .a4 {
+    width: 210mm;
+    height: auto;         /* ← Esto es mejor que height fijo */
+    transform: none;      /* ← Elimina scale */
+  }
+}
+
+
