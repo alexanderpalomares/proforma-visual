@@ -1,6 +1,32 @@
+# Dependencias
 node_modules/
+
+# Carpeta de producción de Vite
 dist/
+
+# Archivos de entorno
 .env
-.vscode
+.env.*.local
+
+# Vite internals
+.vite/
+
+# Archivos del sistema
 .DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
 *.log
+
+# Salida de pruebas (si usas Jest)
+coverage/
+
+# Archivos de lock (opcional ignorar uno)
+# package-lock.json  # si usas Yarn o pnpm, puedes ignorar este
+
+# Configs locales
+*.local
