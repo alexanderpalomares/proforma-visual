@@ -299,7 +299,7 @@ export default function PrevisualizacionProforma({
             {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
             <div style={styles.headerTextGroup}>
               <div style={styles.empresaNombre}>{empresa.nombre}</div>
-              <div style={styles.empresaDato}>RUC: {empresa.ruc}</div>
+              <div style={styles.empresaDato}>{empresa.ruc}</div>
               <div style={styles.empresaDato}>{empresa.direccion}</div>
               {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
               {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
