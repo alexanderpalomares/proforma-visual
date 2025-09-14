@@ -39,6 +39,7 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="20601648391"
         value={empresa.ruc || ""}
         onChange={(e) =>
+          // solo números, máx 11
           setEmpresa((p) => ({
             ...p,
             ruc: e.target.value.replace(/\D/g, "").slice(0, 11),
@@ -58,6 +59,7 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="987916570"
         value={empresa.telefono || ""}
         onChange={(e) =>
+          // deja + y dígitos
           setEmpresa((p) => ({
             ...p,
             telefono: e.target.value.replace(/[^\d+]/g, ""),
@@ -81,19 +83,25 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
 
       {/* Subida de logo en cuadro cuadrado */}
       <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Logo de la empresa
-        </label>
-
-        <div className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
+        <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
           {empresa.logo ? (
-            <img
-              src={empresa.logo}
-              alt="Logo"
-              className="w-full h-full object-contain"
-            />
+            <>
+              <img
+                src={empresa.logo}
+                alt="Logo"
+                className="w-full h-full object-contain"
+              />
+              {/* Botón X arriba a la derecha */}
+              <button
+                type="button"
+                onClick={limpiarLogo}
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
+              >
+                ✕
+              </button>
+            </>
           ) : (
-            <span className="text-gray-400 text-sm">
+            <span className="text-gray-400 text-xs text-center px-2">
               Selecciona tu logo
             </span>
           )}
@@ -107,16 +115,6 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
             onChange={onLogoFile}
           />
         </div>
-
-        {empresa.logo && (
-          <button
-            type="button"
-            onClick={limpiarLogo}
-            className="mt-2 px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-gray-50"
-          >
-            Quitar logo
-          </button>
-        )}
       </div>
     </div>
   );
