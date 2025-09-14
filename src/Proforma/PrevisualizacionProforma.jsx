@@ -9,6 +9,27 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
+// ─────────────────── Función para convertir cualquier imagen a PNG ───────────────────
+const convertToPngBase64 = (fileOrUrl) =>
+  new Promise((resolve, reject) => {
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png")); // convierte todo a PNG
+      };
+      img.onerror = (err) => reject(err);
+      img.src = fileOrUrl;
+    } catch (e) {
+      reject(e);
+    }
+  });
+
 // ─────────────────── Estilos ESPEJO del PDF (ProformaPDF.jsx) ───────────────────
 const styles = {
   page: {
@@ -198,9 +219,9 @@ export default function PrevisualizacionProforma({
   empresa = {},
   cliente = {},
   productos = [],
-  onVolver = () => { },
-  onLimpiarCliente = () => { },
-  onLimpiarProductos = () => { },
+  onVolver = () => {},
+  onLimpiarCliente = () => {},
+  onLimpiarProductos = () => {},
 }) {
   const ref = useRef(null);
   const [pdfStatus, setPdfStatus] = useState("idle");
@@ -227,14 +248,13 @@ export default function PrevisualizacionProforma({
           if (p.imagenForPdf) return p;
           const src = p.imagenFile || p.imagenPreview || p.imagen;
           if (!src) return p;
-          const res = await fetch(src);
-          const blob = await res.blob();
-          const reader = new FileReader();
-          const imagenForPdf = await new Promise((resolve) => {
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-          });
-          return { ...p, imagenForPdf };
+          try {
+            const imagenForPdf = await convertToPngBase64(src);
+            return { ...p, imagenForPdf };
+          } catch (err) {
+            console.error("Error al convertir imagen:", err);
+            return p; // fallback si falla la conversión
+          }
         })
       );
 
@@ -273,10 +293,10 @@ export default function PrevisualizacionProforma({
     pdfStatus === "idle"
       ? { ...styles.btn, ...styles.btnGreen }
       : pdfStatus === "loading"
-        ? { ...styles.btn, ...styles.btnYellow }
-        : pdfStatus === "success"
-          ? { ...styles.btn, ...styles.btnBlue }
-          : { ...styles.btn, ...styles.btnRed };
+      ? { ...styles.btn, ...styles.btnYellow }
+      : pdfStatus === "success"
+      ? { ...styles.btn, ...styles.btnBlue }
+      : { ...styles.btn, ...styles.btnRed };
 
   const numeroParaMostrar = numeroFinal ?? numeroPreview;
 
@@ -303,10 +323,7 @@ export default function PrevisualizacionProforma({
               <div style={styles.empresaDato}>{empresa.direccion}</div>
               {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
               {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
-              {empresa.web && (
-                <div style={styles.empresaDato}>{empresa.web}</div>
-              )}
-
+              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
             </div>
           </div>
 
@@ -380,11 +397,12 @@ export default function PrevisualizacionProforma({
           <div style={styles.totalText}>IGV (0%): S/ {formatMoney(0)}</div>
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
         </div>
-
-
       </div>
 
-      <div className="print:hidden" style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}>
+      <div
+        className="print:hidden"
+        style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}
+      >
         <button
           type="button"
           onClick={handleExportPdfPro}
