@@ -6,9 +6,9 @@ export default function FormularioCliente({ cliente, setCliente }) {
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      <input className={input} name="nombre"    placeholder="Nombre del Cliente" value={cliente.nombre} onChange={onChange}/>
-      <input className={input} name="ruc"       placeholder="DNI o RUC" value={cliente.ruc} onChange={onChange}/>
-      <input className={input} name="direccion" placeholder="Dirección" value={cliente.direccion} onChange={onChange}/>
+      <input className={input} name="nombre"    placeholder="Ramoón Manrique" value={cliente.nombre} onChange={onChange}/>
+      <input className={input} name="ruc"       placeholder="46420566" value={cliente.ruc} onChange={onChange}/>
+      <input className={input} name="direccion" placeholder="Jr. Alfonso Ugarte 392, Tarapoto" value={cliente.direccion} onChange={onChange}/>
       <input className={input} type="date" name="fecha" value={cliente.fecha} onChange={onChange}/>
     </div>
   );
