@@ -47,7 +47,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#D9D9D9",
   },
-  logo: { width: 83, height: 83, marginRight: 12 },
+
+  logo: {
+    width: 90,
+    height: "auto",
+    marginRight: 12,
+    borderRadius: 8,
+    objectFit: "contain",
+  },
+
   headerTextGroup: { color: "#000" },
   empresaNombre: { fontWeight: "bold" },
   proformaBlock: { textAlign: "right" },
