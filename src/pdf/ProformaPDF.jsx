@@ -49,14 +49,20 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 90,
-    height: "auto",
+    height: 70,         // controla la altura máxima
+    width: "auto",      // mantiene proporción del logo
     marginRight: 12,
-    borderRadius: 8,
-    objectFit: "contain",
+    borderRadius: 10,   // esquinas redondeadas
+    alignSelf: "center" // asegura que quede alineado con el texto
   },
 
-  headerTextGroup: { color: "#000" },
+
+  headerTextGroup: {
+    justifyContent: "center", // centra verticalmente el texto
+    color: "#000"
+  },
+
+
   empresaNombre: { fontWeight: "bold" },
   proformaBlock: { textAlign: "right" },
   proformaTitle: {
