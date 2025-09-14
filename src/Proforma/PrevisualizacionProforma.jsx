@@ -317,7 +317,7 @@ export default function PrevisualizacionProforma({
         </div>
 
         <div style={styles.clienteSection}>
-          <div style={styles.clienteLabel}>Datos del Cliente</div>
+          <div style={styles.clienteLabel}>Cliente</div>
           {cliente.nombre && <div style={styles.clienteItem}>Nombre: {cliente.nombre}</div>}
           {cliente.ruc && <div style={styles.clienteItem}>RUC: {cliente.ruc}</div>}
           {cliente.direccion && <div style={styles.clienteItem}>Dirección: {cliente.direccion}</div>}
