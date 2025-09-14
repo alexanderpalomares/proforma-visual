@@ -8,23 +8,6 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
   const onChange = (e) =>
     setEmpresa((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // Extrae @usuario desde texto o URL
-  const normalizeInstagram = (raw) => {
-    if (!raw) return "";
-    const v = String(raw).trim();
-    // si viene URL, saca el username
-    const m =
-      v.match(/instagram\.com\/([^/?#]+)/i) ||
-      v.match(/(?:^|[^@\w])@([\w\.]+)/); // @usuario
-    const user = m ? (m[1] || m[0].replace("@", "")).replace(/^\@/, "") : v.replace(/^@/, "");
-    return user ? `@${user}` : "";
-  };
-
-  const onInstagramBlur = (e) => {
-    const normal = normalizeInstagram(e.target.value);
-    setEmpresa((prev) => ({ ...prev, instagram: normal }));
-  };
-
   // Permite subir archivo y guarda DataURL en empresa.logo
   const onLogoFile = (e) => {
     const file = e.target.files?.[0];
@@ -56,8 +39,10 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="20601648391"
         value={empresa.ruc || ""}
         onChange={(e) =>
-          // solo números, máx 11
-          setEmpresa((p) => ({ ...p, ruc: e.target.value.replace(/\D/g, "").slice(0, 11) }))
+          setEmpresa((p) => ({
+            ...p,
+            ruc: e.target.value.replace(/\D/g, "").slice(0, 11),
+          }))
         }
       />
       <input
@@ -73,8 +58,10 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="987916570"
         value={empresa.telefono || ""}
         onChange={(e) =>
-          // deja + y dígitos
-          setEmpresa((p) => ({ ...p, telefono: e.target.value.replace(/[^\d+]/g, "") }))
+          setEmpresa((p) => ({
+            ...p,
+            telefono: e.target.value.replace(/[^\d+]/g, ""),
+          }))
         }
       />
       <input
@@ -92,40 +79,45 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         onChange={onChange}
       />
 
+      {/* Subida de logo en cuadro cuadrado */}
+      <div className="md:col-span-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Logo de la empresa
+        </label>
 
-      {/* Subida de logo con vista previa */}
-      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
-        <div className="flex gap-3">
+        <div className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
+          {empresa.logo ? (
+            <img
+              src={empresa.logo}
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <span className="text-gray-400 text-sm">
+              Selecciona tu logo
+            </span>
+          )}
+
+          {/* Input invisible que cubre todo el cuadro */}
           <input
             ref={fileRef}
             type="file"
             accept="image/*"
-            className={input}
+            className="absolute inset-0 opacity-0 cursor-pointer"
             onChange={onLogoFile}
           />
+        </div>
+
+        {empresa.logo && (
           <button
             type="button"
             onClick={limpiarLogo}
-            className="px-3 py-2.5 rounded-lg border border-gray-300 hover:bg-gray-50"
+            className="mt-2 px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-gray-50"
           >
             Quitar logo
           </button>
-        </div>
-
-        {empresa.logo ? (
-          <img
-            src={empresa.logo}
-            alt="Logo"
-            className="h-16 md:h-20 w-auto object-contain justify-self-start md:justify-self-end"
-          />
-        ) : (
-          <span className="text-sm text-gray-500 justify-self-start md:justify-self-end">
-            (Sin logo)
-          </span>
         )}
       </div>
-
-
     </div>
   );
 }
