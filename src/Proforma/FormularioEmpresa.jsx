@@ -87,7 +87,7 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       <input
         className={input}
         name="web"
-        placeholder="Ej: www.carlitosbicentro.com"
+        placeholder="www.ferreteriakike.com"
         value={empresa.web || ""}
         onChange={onChange}
       />
