@@ -304,7 +304,7 @@ export default function PrevisualizacionProforma({
               {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
               {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
               {empresa.web && (
-                <div style={styles.empresaDato}>Web: {empresa.web}</div>
+                <div style={styles.empresaDato}>{empresa.web}</div>
               )}
 
             </div>
