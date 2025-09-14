@@ -4,9 +4,10 @@ import React, { useState } from "react";
 export default function FormularioProductosMultiples({
   productos,
   setProductos,
-  manejarMostrarPrevisualizacion
+  manejarMostrarPrevisualizacion,
 }) {
   const [errorCampos, setErrorCampos] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Conversión numérica segura
   const toNumber = (v) => {
@@ -15,9 +16,8 @@ export default function FormularioProductosMultiples({
     return Number.isFinite(n) ? n : 0;
   };
 
-  // Carga múltiple de imágenes
-  const handleImagenes = (e) => {
-    const archivos = Array.from(e.target.files || []);
+  // Procesa los archivos y los convierte en productos
+  const procesarArchivos = (archivos) => {
     if (!archivos.length) return;
 
     const nuevos = archivos.map((archivo) => ({
@@ -28,10 +28,33 @@ export default function FormularioProductosMultiples({
       descripcion: "",
       precio: "",
       cantidad: "",
-      importe: 0
+      importe: 0,
     }));
 
     setProductos([...(productos || []), ...nuevos]);
+  };
+
+  // Carga múltiple de imágenes con input
+  const handleImagenes = (e) => {
+    const archivos = Array.from(e.target.files || []);
+    procesarArchivos(archivos);
+  };
+
+  // Drag & Drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const archivos = Array.from(e.dataTransfer.files || []);
+    procesarArchivos(archivos);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   // Cambia valores y recalcula importe
@@ -57,7 +80,8 @@ export default function FormularioProductosMultiples({
   // Abre previsualización (validación no bloqueante)
   const abrirProforma = () => {
     const hayFaltantes = (productos || []).some(
-      (p) => !p || !p.nombre || toNumber(p.precio) === 0 || toNumber(p.cantidad) === 0
+      (p) =>
+        !p || !p.nombre || toNumber(p.precio) === 0 || toNumber(p.cantidad) === 0
     );
     setErrorCampos(hayFaltantes);
     manejarMostrarPrevisualizacion();
@@ -65,10 +89,32 @@ export default function FormularioProductosMultiples({
 
   return (
     <div className="space-y-4">
-      {/* Selector de imágenes */}
+      {/* Dropzone intuitivo con drag & drop */}
       <div>
         <label className="block text-sm font-medium mb-2">Agregar imágenes</label>
-        <input type="file" accept="image/*" multiple onChange={handleImagenes} />
+
+        <div
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer relative transition ${
+            isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImagenes}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+          />
+          <p className="text-gray-500">
+            {isDragging
+              ? "Suelta las imágenes aquí"
+              : "Haz clic o arrastra tus imágenes aquí"}
+          </p>
+        </div>
+
         {errorCampos && (
           <p className="text-sm text-amber-600 mt-2">
             Hay productos con datos incompletos. Revísalos antes de enviar al cliente.
@@ -96,80 +142,76 @@ export default function FormularioProductosMultiples({
                 Eliminar
               </button>
 
-              {/* Contenido */}
-              <div className="flex flex-col md:flex-row gap-4">
-                {/* Imagen */}
-                <div className="flex-shrink-0">
-                  {p.imagenPreview && (
-                    <img
-                      src={p.imagenPreview}
-                      alt={p.nombre || "producto"}
-                      className="h-20 w-auto object-contain border rounded"
-                    />
-                  )}
+              {/* Campos */}
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    value={p.nombre}
+                    onChange={(e) => handleChange(p.id, "nombre", e.target.value)}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
 
-                {/* Campos */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Nombre</label>
-                    <input
-                      type="text"
-                      value={p.nombre}
-                      onChange={(e) => handleChange(p.id, "nombre", e.target.value)}
-                      className="w-full border rounded px-3 py-2"
-                    />
-                  </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-1">
+                    Descripción
+                  </label>
+                  <textarea
+                    value={p.descripcion}
+                    onChange={(e) =>
+                      handleChange(p.id, "descripcion", e.target.value)
+                    }
+                    className="w-full border rounded px-3 py-2"
+                    rows={2}
+                    maxLength={150}
+                    style={{ resize: "none" }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {p.descripcion.length}/150 caracteres
+                  </p>
+                </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium mb-1">Descripción</label>
-                    <textarea
-                      value={p.descripcion}
-                      onChange={(e) =>
-                        handleChange(p.id, "descripcion", e.target.value)
-                      }
-                      className="w-full border rounded px-3 py-2"
-                      rows={2}
-                      maxLength={150}
-                      style={{ resize: "none" }}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      {p.descripcion.length}/150 caracteres
-                    </p>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Precio (S/)
+                  </label>
+                  <input
+                    type="number"
+                    value={p.precio}
+                    onChange={(e) => handleChange(p.id, "precio", e.target.value)}
+                    className="border rounded px-3 py-2"
+                    style={{ width: "120px" }}
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Precio (S/)</label>
-                    <input
-                      type="number"
-                      value={p.precio}
-                      onChange={(e) => handleChange(p.id, "precio", e.target.value)}
-                      className="border rounded px-3 py-2"
-                      style={{ width: "120px" }}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Cantidad
+                  </label>
+                  <input
+                    type="number"
+                    value={p.cantidad}
+                    onChange={(e) =>
+                      handleChange(p.id, "cantidad", e.target.value)
+                    }
+                    className="border rounded px-3 py-2"
+                    style={{ width: "120px" }}
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Cantidad</label>
-                    <input
-                      type="number"
-                      value={p.cantidad}
-                      onChange={(e) => handleChange(p.id, "cantidad", e.target.value)}
-                      className="border rounded px-3 py-2"
-                      style={{ width: "120px" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Importe (S/)</label>
-                    <input
-                      type="text"
-                      value={toNumber(p.importe).toFixed(2)}
-                      readOnly
-                      className="border rounded px-3 py-2 bg-gray-100"
-                      style={{ width: "120px" }}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Importe (S/)
+                  </label>
+                  <input
+                    type="text"
+                    value={toNumber(p.importe).toFixed(2)}
+                    readOnly
+                    className="border rounded px-3 py-2 bg-gray-100"
+                    style={{ width: "120px" }}
+                  />
                 </div>
               </div>
             </div>
