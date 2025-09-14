@@ -1,3 +1,4 @@
+// src/pdf/ProformaPDF.jsx
 import React from "react";
 import {
   Page,
@@ -9,7 +10,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 
-// Registrar Poppins (solo para "PROFORMA" y nombre del producto)
+// Registrar Poppins (para PROFORMA y nombre del producto)
 Font.register({
   family: "Poppins",
   fonts: [
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     backgroundColor: "#ffffff",
   },
-
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -49,21 +49,14 @@ const styles = StyleSheet.create({
   },
   logo: { width: 83, height: 83, marginRight: 12 },
   headerTextGroup: { color: "#000" },
-  empresaNombre: {
-    fontWeight: "bold",
-  },
+  empresaNombre: { fontWeight: "bold" },
   proformaBlock: { textAlign: "right" },
   proformaTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#000",
     fontFamily: "Poppins",
   },
-  proformaNumber: {
-    fontSize: 11,
-    marginTop: 2,
-  },
-
+  proformaNumber: { fontSize: 11, marginTop: 2 },
   clienteSection: {
     paddingTop: 6,
     paddingBottom: 10,
@@ -72,7 +65,6 @@ const styles = StyleSheet.create({
     borderColor: "#E5E5E5",
   },
   clienteLabel: { fontWeight: "bold" },
-
   productoRow: {
     flexDirection: "row",
     gap: 12,
@@ -116,33 +108,21 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 8,
   },
-  priceItem: {
-    minWidth: 90,
-    alignItems: "flex-end",
-  },
-  priceLabel: {
-    fontSize: 9,
-    color: "#666",
-  },
-  priceValue: {
-    fontSize: 11,
-    fontWeight: "bold",
-  },
-
+  priceItem: { minWidth: 90, alignItems: "flex-end" },
+  priceLabel: { fontSize: 9, color: "#666" },
+  priceValue: { fontSize: 11, fontWeight: "bold" },
   totalWrap: {
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
     borderColor: "#E5E5E5",
   },
-
   totalText: {
     textAlign: "right",
     fontWeight: "bold",
     fontSize: 12,
     marginTop: 4,
   },
-
   footer: {
     marginTop: 12,
     paddingTop: 10,
@@ -153,7 +133,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderColor: "#D0D0D0",
   },
-
   pageNumber: {
     position: "absolute",
     bottom: 10,
@@ -180,13 +159,11 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
             {empresa.logo && <Image src={empresa.logo} style={styles.logo} />}
             <View style={styles.headerTextGroup}>
               <Text style={styles.empresaNombre}>{empresa.nombre}</Text>
-              <Text>RUC: {empresa.ruc}</Text>
-              <Text>{empresa.direccion}</Text>
+              {empresa.ruc && <Text>{empresa.ruc}</Text>}
+              {empresa.direccion && <Text>{empresa.direccion}</Text>}
               {empresa.telefono && <Text>Tel: {empresa.telefono}</Text>}
               {empresa.correo && <Text>{empresa.correo}</Text>}
-              {empresa.instagram && (
-                <Text>Instagram: {empresa.instagram}</Text>
-              )}
+              {empresa.web && <Text>{empresa.web}</Text>}
             </View>
           </View>
           <View style={styles.proformaBlock}>
@@ -194,9 +171,7 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
             {numeroProforma && (
               <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>
             )}
-            {cliente.fecha && (
-              <Text style={{ color: "#000" }}>Fecha: {cliente.fecha}</Text>
-            )}
+            {cliente.fecha && <Text>Fecha: {cliente.fecha}</Text>}
           </View>
         </View>
 
@@ -204,8 +179,8 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
         <View style={styles.clienteSection}>
           <Text style={styles.clienteLabel}>Datos del Cliente</Text>
           {cliente.nombre && <Text>Nombre: {cliente.nombre}</Text>}
-          {cliente.ruc && <Text>RUC: {cliente.ruc}</Text>}
-          {cliente.direccion && <Text>Dirección: {cliente.direccion}</Text>}
+          {cliente.ruc && <Text>{cliente.ruc}</Text>}
+          {cliente.direccion && <Text>{cliente.direccion}</Text>}
         </View>
 
         {/* Productos */}
@@ -253,12 +228,14 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
 
         {/* Total con desglose */}
         <View style={styles.totalWrap}>
-          <Text style={styles.totalText}>Subtotal: S/ {formatMoney(subtotal)}</Text>
+          <Text style={styles.totalText}>
+            Subtotal: S/ {formatMoney(subtotal)}
+          </Text>
           <Text style={styles.totalText}>IGV (0%): S/ {formatMoney(igv)}</Text>
           <Text style={styles.totalText}>Total: S/ {formatMoney(total)}</Text>
         </View>
 
-        {/* Footer con nota legal */}
+        {/* Footer */}
         <View style={styles.footer}>
           <Text>
             <Text style={{ fontWeight: "bold" }}>Condiciones:</Text> Precios en
@@ -272,11 +249,11 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
             {empresa?.nombre || "Bicicentro Carlitos"}.
           </Text>
           <Text>
-            Esta es una proforma informativa, no constituye comprobante de
-            pago.
+            Esta es una proforma informativa, no constituye comprobante de pago.
           </Text>
           <Text>
-            * Venta sujeta a exoneración de IGV según Ley de la Amazonía (D.S. N.º 055-99-EF).
+            * Venta sujeta a exoneración de IGV según Ley de la Amazonía (D.S. N.º
+            055-99-EF).
           </Text>
         </View>
 
