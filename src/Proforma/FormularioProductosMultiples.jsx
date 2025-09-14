@@ -158,7 +158,7 @@ export default function FormularioProductosMultiples({
                     <img
                       src={p.imagenPreview}
                       alt={p.nombre || "producto"}
-                      className="h-20 w-auto object-contain border rounded"
+                      className="h-26 w-auto object-contain border rounded"
                     />
                   )}
                 </div>
