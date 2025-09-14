@@ -46,14 +46,14 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       <input
         className={input}
         name="nombre"
-        placeholder="Nombre o Razón Social"
+        placeholder="Ferretería Kike"
         value={empresa.nombre || ""}
         onChange={onChange}
       />
       <input
         className={input}
         name="ruc"
-        placeholder="RUC (11 dígitos)"
+        placeholder="20601648391"
         value={empresa.ruc || ""}
         onChange={(e) =>
           // solo números, máx 11
@@ -63,14 +63,14 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       <input
         className={input}
         name="direccion"
-        placeholder="Dirección"
+        placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
         value={empresa.direccion || ""}
         onChange={onChange}
       />
       <input
         className={input}
         name="telefono"
-        placeholder="Teléfono / WhatsApp"
+        placeholder="987916570"
         value={empresa.telefono || ""}
         onChange={(e) =>
           // deja + y dígitos
@@ -80,14 +80,14 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       <input
         className={input}
         name="correo"
-        placeholder="Correo electrónico"
+        placeholder="ferreteriakike@gmail.com"
         value={empresa.correo || ""}
         onChange={onChange}
       />
       <input
         className={input}
         name="instagram"
-        placeholder="Instagram (ej. @miempresa o url)"
+        placeholder="@ferreteriakike"
         value={empresa.instagram || ""}
         onChange={onChange}
         onBlur={onInstagramBlur}
