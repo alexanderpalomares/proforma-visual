@@ -51,16 +51,16 @@ function App() {
         {!mostrarPrevisualizacion ? (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SectionCard title="Datos de la Empresa" className="h-full">
+              <SectionCard title="Ingresa los datos de tu empresa" className="h-full">
                 <FormularioEmpresa empresa={empresa} setEmpresa={setEmpresa} />
               </SectionCard>
 
-              <SectionCard title="Datos del Cliente" className="h-full">
+              <SectionCard title="Ingresa los datos de tu cliente" className="h-full">
                 <FormularioCliente cliente={cliente} setCliente={setCliente} />
               </SectionCard>
             </div>
 
-            <SectionCard title="Agregar Productos" className="col-span-2">
+            <SectionCard title="Ingresa tus productos" className="col-span-2">
               <FormularioProductosMultiples
                 cliente={cliente}
                 productos={productos}
