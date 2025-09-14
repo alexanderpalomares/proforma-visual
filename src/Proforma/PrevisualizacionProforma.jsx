@@ -380,21 +380,7 @@ export default function PrevisualizacionProforma({
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
         </div>
 
-        <div style={styles.footer}>
-          <p>
-            <strong>Condiciones:</strong> Precios en soles e IGV incluido (salvo indicación
-            contraria). Validez de la proforma: 7 días. Entrega sujeta a stock. Plazo de
-            entrega típico: 24–48 horas.
-          </p>
-          <p>
-            <strong>Pago:</strong> Transferencia o depósito. BCP Soles: 123-456789-0-12 — A
-            nombre de {empresa?.nombre || "Bicicentro Carlitos"}.
-          </p>
-          <p>Esta es una proforma informativa, no constituye comprobante de pago.</p>
-          <p>
-            * Venta sujeta a exoneración de IGV según Ley de la Amazonía (D.S. N.º 055-99-EF).
-          </p>
-        </div>
+      
       </div>
 
       <div className="print:hidden" style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}>
