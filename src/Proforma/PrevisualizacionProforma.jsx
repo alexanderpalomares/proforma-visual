@@ -198,9 +198,9 @@ export default function PrevisualizacionProforma({
   empresa = {},
   cliente = {},
   productos = [],
-  onVolver = () => {},
-  onLimpiarCliente = () => {},
-  onLimpiarProductos = () => {},
+  onVolver = () => { },
+  onLimpiarCliente = () => { },
+  onLimpiarProductos = () => { },
 }) {
   const ref = useRef(null);
   const [pdfStatus, setPdfStatus] = useState("idle");
@@ -273,10 +273,10 @@ export default function PrevisualizacionProforma({
     pdfStatus === "idle"
       ? { ...styles.btn, ...styles.btnGreen }
       : pdfStatus === "loading"
-      ? { ...styles.btn, ...styles.btnYellow }
-      : pdfStatus === "success"
-      ? { ...styles.btn, ...styles.btnBlue }
-      : { ...styles.btn, ...styles.btnRed };
+        ? { ...styles.btn, ...styles.btnYellow }
+        : pdfStatus === "success"
+          ? { ...styles.btn, ...styles.btnBlue }
+          : { ...styles.btn, ...styles.btnRed };
 
   const numeroParaMostrar = numeroFinal ?? numeroPreview;
 
@@ -303,9 +303,10 @@ export default function PrevisualizacionProforma({
               <div style={styles.empresaDato}>{empresa.direccion}</div>
               {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
               {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
-              {empresa.instagram && (
-                <div style={styles.empresaDato}>Instagram: {empresa.instagram}</div>
+              {empresa.web && (
+                <div style={styles.empresaDato}>Web: {empresa.web}</div>
               )}
+
             </div>
           </div>
 
@@ -380,7 +381,7 @@ export default function PrevisualizacionProforma({
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
         </div>
 
-      
+
       </div>
 
       <div className="print:hidden" style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}>

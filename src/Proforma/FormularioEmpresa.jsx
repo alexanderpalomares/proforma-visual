@@ -86,12 +86,12 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       />
       <input
         className={input}
-        name="instagram"
-        placeholder="@ferreteriakike"
-        value={empresa.instagram || ""}
+        name="web"
+        placeholder="Ej: www.carlitosbicentro.com"
+        value={empresa.web || ""}
         onChange={onChange}
-        onBlur={onInstagramBlur}
       />
+
 
       {/* Subida de logo con vista previa */}
       <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
@@ -125,7 +125,7 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         )}
       </div>
 
-      
+
     </div>
   );
 }
