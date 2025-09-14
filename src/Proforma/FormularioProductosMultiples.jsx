@@ -16,11 +16,14 @@ export default function FormularioProductosMultiples({
     return Number.isFinite(n) ? n : 0;
   };
 
-  // Procesa los archivos y los convierte en productos
-  const procesarArchivos = (archivos) => {
-    if (!archivos.length) return;
+  // Crea productos desde archivos
+  const crearProductosDesdeArchivos = (archivos) => {
+    if (!archivos?.length) return [];
 
-    const nuevos = archivos.map((archivo) => ({
+    // Solo imágenes
+    const imgs = archivos.filter((f) => f.type?.startsWith("image/"));
+
+    return imgs.map((archivo) => ({
       id: crypto.randomUUID(),
       imagen: archivo,
       imagenPreview: URL.createObjectURL(archivo),
@@ -30,14 +33,14 @@ export default function FormularioProductosMultiples({
       cantidad: "",
       importe: 0,
     }));
-
-    setProductos([...(productos || []), ...nuevos]);
   };
 
-  // Carga múltiple de imágenes con input
+  // Input (clic)
   const handleImagenes = (e) => {
     const archivos = Array.from(e.target.files || []);
-    procesarArchivos(archivos);
+    const nuevos = crearProductosDesdeArchivos(archivos);
+    if (!nuevos.length) return;
+    setProductos([...(productos || []), ...nuevos]);
   };
 
   // Drag & Drop
@@ -45,7 +48,9 @@ export default function FormularioProductosMultiples({
     e.preventDefault();
     setIsDragging(false);
     const archivos = Array.from(e.dataTransfer.files || []);
-    procesarArchivos(archivos);
+    const nuevos = crearProductosDesdeArchivos(archivos);
+    if (!nuevos.length) return;
+    setProductos([...(productos || []), ...nuevos]);
   };
 
   const handleDragOver = (e) => {
@@ -53,9 +58,7 @@ export default function FormularioProductosMultiples({
     setIsDragging(true);
   };
 
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+  const handleDragLeave = () => setIsDragging(false);
 
   // Cambia valores y recalcula importe
   const handleChange = (id, name, value) => {
@@ -72,8 +75,10 @@ export default function FormularioProductosMultiples({
     setProductos(actualizados);
   };
 
-  // Elimina un producto
+  // Elimina un producto (revoca URL para evitar fugas)
   const eliminarProducto = (id) => {
+    const prod = productos.find((p) => p.id === id);
+    if (prod?.imagenPreview) URL.revokeObjectURL(prod.imagenPreview);
     setProductos(productos.filter((p) => p.id !== id));
   };
 
@@ -81,7 +86,10 @@ export default function FormularioProductosMultiples({
   const abrirProforma = () => {
     const hayFaltantes = (productos || []).some(
       (p) =>
-        !p || !p.nombre || toNumber(p.precio) === 0 || toNumber(p.cantidad) === 0
+        !p ||
+        !p.nombre ||
+        toNumber(p.precio) === 0 ||
+        toNumber(p.cantidad) === 0
     );
     setErrorCampos(hayFaltantes);
     manejarMostrarPrevisualizacion();
@@ -142,76 +150,80 @@ export default function FormularioProductosMultiples({
                 Eliminar
               </button>
 
-              {/* Campos */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Nombre</label>
-                  <input
-                    type="text"
-                    value={p.nombre}
-                    onChange={(e) => handleChange(p.id, "nombre", e.target.value)}
-                    className="w-full border rounded px-3 py-2"
-                  />
+              {/* Contenido */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Miniatura (como el original, sin botón encima) */}
+                <div className="flex-shrink-0">
+                  {p.imagenPreview && (
+                    <img
+                      src={p.imagenPreview}
+                      alt={p.nombre || "producto"}
+                      className="h-20 w-auto object-contain border rounded"
+                    />
+                  )}
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Descripción
-                  </label>
-                  <textarea
-                    value={p.descripcion}
-                    onChange={(e) =>
-                      handleChange(p.id, "descripcion", e.target.value)
-                    }
-                    className="w-full border rounded px-3 py-2"
-                    rows={2}
-                    maxLength={150}
-                    style={{ resize: "none" }}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {p.descripcion.length}/150 caracteres
-                  </p>
-                </div>
+                {/* Campos */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Nombre</label>
+                    <input
+                      type="text"
+                      value={p.nombre}
+                      onChange={(e) => handleChange(p.id, "nombre", e.target.value)}
+                      className="w-full border rounded px-3 py-2"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Precio (S/)
-                  </label>
-                  <input
-                    type="number"
-                    value={p.precio}
-                    onChange={(e) => handleChange(p.id, "precio", e.target.value)}
-                    className="border rounded px-3 py-2"
-                    style={{ width: "120px" }}
-                  />
-                </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <textarea
+                      value={p.descripcion}
+                      onChange={(e) =>
+                        handleChange(p.id, "descripcion", e.target.value)
+                      }
+                      className="w-full border rounded px-3 py-2"
+                      rows={2}
+                      maxLength={150}
+                      style={{ resize: "none" }}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {p.descripcion.length}/150 caracteres
+                    </p>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Cantidad
-                  </label>
-                  <input
-                    type="number"
-                    value={p.cantidad}
-                    onChange={(e) =>
-                      handleChange(p.id, "cantidad", e.target.value)
-                    }
-                    className="border rounded px-3 py-2"
-                    style={{ width: "120px" }}
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Precio (S/)</label>
+                    <input
+                      type="number"
+                      value={p.precio}
+                      onChange={(e) => handleChange(p.id, "precio", e.target.value)}
+                      className="border rounded px-3 py-2"
+                      style={{ width: "120px" }}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Importe (S/)
-                  </label>
-                  <input
-                    type="text"
-                    value={toNumber(p.importe).toFixed(2)}
-                    readOnly
-                    className="border rounded px-3 py-2 bg-gray-100"
-                    style={{ width: "120px" }}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Cantidad</label>
+                    <input
+                      type="number"
+                      value={p.cantidad}
+                      onChange={(e) => handleChange(p.id, "cantidad", e.target.value)}
+                      className="border rounded px-3 py-2"
+                      style={{ width: "120px" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Importe (S/)</label>
+                    <input
+                      type="text"
+                      value={toNumber(p.importe).toFixed(2)}
+                      readOnly
+                      className="border rounded px-3 py-2 bg-gray-100"
+                      style={{ width: "120px" }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
