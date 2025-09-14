@@ -99,7 +99,7 @@ export default function FormularioProductosMultiples({
     <div className="space-y-4">
       {/* Dropzone intuitivo con drag & drop */}
       <div>
-        <label className="block text-sm font-medium mb-2">Agregar imágenes</label>
+        
 
         <div
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer relative transition ${
