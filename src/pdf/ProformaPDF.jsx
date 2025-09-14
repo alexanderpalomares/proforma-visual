@@ -123,16 +123,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
-  footer: {
-    marginTop: 12,
-    paddingTop: 10,
-    fontSize: 9,
-    color: "#555",
-    lineHeight: 1.3,
-    textAlign: "justify",
-    borderTopWidth: 2,
-    borderColor: "#D0D0D0",
-  },
   pageNumber: {
     position: "absolute",
     bottom: 10,
@@ -177,10 +167,10 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
 
         {/* Cliente */}
         <View style={styles.clienteSection}>
-          <Text style={styles.clienteLabel}>Datos del Cliente</Text>
+          <Text style={styles.clienteLabel}>Cliente</Text>
           {cliente.nombre && <Text>Nombre: {cliente.nombre}</Text>}
-          {cliente.ruc && <Text>{cliente.ruc}</Text>}
-          {cliente.direccion && <Text>{cliente.direccion}</Text>}
+          {cliente.ruc && <Text>RUC: {cliente.ruc}</Text>}
+          {cliente.direccion && <Text>Dirección: {cliente.direccion}</Text>}
         </View>
 
         {/* Productos */}
@@ -233,28 +223,6 @@ const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
           </Text>
           <Text style={styles.totalText}>IGV (0%): S/ {formatMoney(igv)}</Text>
           <Text style={styles.totalText}>Total: S/ {formatMoney(total)}</Text>
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text>
-            <Text style={{ fontWeight: "bold" }}>Condiciones:</Text> Precios en
-            soles e IGV incluido (salvo indicación contraria). Validez de la
-            proforma: 7 días. Entrega sujeta a stock. Plazo de entrega típico:
-            24–48 horas.
-          </Text>
-          <Text>
-            <Text style={{ fontWeight: "bold" }}>Pago:</Text> Transferencia o
-            depósito. BCP Soles: 123-456789-0-12 — A nombre de{" "}
-            {empresa?.nombre || "Bicicentro Carlitos"}.
-          </Text>
-          <Text>
-            Esta es una proforma informativa, no constituye comprobante de pago.
-          </Text>
-          <Text>
-            * Venta sujeta a exoneración de IGV según Ley de la Amazonía (D.S. N.º
-            055-99-EF).
-          </Text>
         </View>
 
         {/* Nº de página */}
