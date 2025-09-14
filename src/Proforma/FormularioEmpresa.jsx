@@ -84,36 +84,42 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       {/* Subida de logo en cuadro cuadrado */}
       <div className="md:col-span-2">
         <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
+          {/* Input invisible detrás */}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="absolute inset-0 opacity-0 cursor-pointer z-0"
+            onChange={onLogoFile}
+          />
+
           {empresa.logo ? (
             <>
               <img
                 src={empresa.logo}
                 alt="Logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain z-10 pointer-events-none"
               />
+
               {/* Botón X arriba a la derecha */}
               <button
                 type="button"
-                onClick={limpiarLogo}
-                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
+                aria-label="Quitar logo"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  limpiarLogo();
+                }}
+                className="absolute top-1 right-1 z-20 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
               >
                 ✕
               </button>
             </>
           ) : (
-            <span className="text-gray-400 text-xs text-center px-2">
+            <span className="text-gray-400 text-xs text-center px-2 z-10 pointer-events-none">
               Selecciona tu logo
             </span>
           )}
-
-          {/* Input invisible que cubre todo el cuadro */}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 opacity-0 cursor-pointer"
-            onChange={onLogoFile}
-          />
         </div>
       </div>
     </div>
