@@ -23,9 +23,7 @@ export default function Portada({ onComenzar }) {
                 style={{
                     width: 280,
                     height: "auto",
-                    borderRadius: 16,
-                    marginBottom: 24,
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+                   
                 }}
             />
 
