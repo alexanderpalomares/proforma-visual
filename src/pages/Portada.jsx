@@ -58,7 +58,7 @@ export default function Portada({ onComenzar }) {
                     color: "#444",
                     maxWidth: 500,
                     marginBottom: 24,
-                    lineHeight: 1.3,
+                    lineHeight: 1.2,
                 }}
             >
                 Genera proformas profesionales con fotos de tus productos en segundos.
