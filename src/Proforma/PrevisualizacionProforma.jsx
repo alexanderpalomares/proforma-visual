@@ -43,24 +43,14 @@ const styles = {
     color: "#000",
   },
 
-  // Header Moderno
+  // Header minimalista
   header: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 20,
   },
-  headerLeft: { display: "flex", flexDirection: "row", gap: 14 },
   logo: { width: 70, height: 70, borderRadius: "50%", objectFit: "cover" },
-  empresaNombre: {
-    fontSize: 16,
-    fontWeight: 700,
-    fontFamily: "Poppins, sans-serif",
-    color: "#111",
-    marginBottom: 4,
-  },
-  empresaDato: { fontSize: 13, color: "#555", marginBottom: 2 },
-
   headerRight: { textAlign: "right" },
   proformaTitle: {
     fontSize: 18,
@@ -150,6 +140,27 @@ const styles = {
     fontSize: 15,
     marginTop: 4,
     lineHeight: 1.2,
+  },
+
+  // Footer moderno
+  footer: {
+    marginTop: 32,
+    padding: "16px 0",
+    borderTop: "2px solid #f1f5f9",
+    display: "flex",
+    justifyContent: "center",
+    fontSize: 12,
+    color: "#475569",
+    gap: 40,
+  },
+  footerBlock: {
+    textAlign: "center",
+    lineHeight: 1.4,
+  },
+  footerStrong: {
+    fontWeight: 700,
+    fontFamily: "Poppins, sans-serif",
+    color: "#111",
   },
 
   // Acciones
@@ -301,28 +312,11 @@ export default function PrevisualizacionProforma({
       )}
 
       <div ref={ref} style={styles.page}>
-        {/* ───── Header Moderno ───── */}
+        {/* ───── Header ───── */}
         <div style={styles.header}>
-          <div style={styles.headerLeft}>
-            {empresa.logo && (
-              <img src={empresa.logo} alt="Logo" style={styles.logo} />
-            )}
-            <div>
-              <div style={styles.empresaNombre}>{empresa.nombre}</div>
-              {empresa.ruc && <div style={styles.empresaDato}>{empresa.ruc}</div>}
-              {empresa.direccion && (
-                <div style={styles.empresaDato}>{empresa.direccion}</div>
-              )}
-              {empresa.telefono && (
-                <div style={styles.empresaDato}>{empresa.telefono}</div>
-              )}
-              {empresa.correo && (
-                <div style={styles.empresaDato}>{empresa.correo}</div>
-              )}
-              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
-            </div>
-          </div>
-
+          {empresa.logo && (
+            <img src={empresa.logo} alt="Logo" style={styles.logo} />
+          )}
           <div style={styles.headerRight}>
             <div style={styles.proformaTitle}>PROFORMA</div>
             <div style={styles.proformaNumber}>N°: {numeroParaMostrar}</div>
@@ -413,6 +407,19 @@ export default function PrevisualizacionProforma({
           <div style={styles.totalText}>Subtotal: S/ {formatMoney(total)}</div>
           <div style={styles.totalText}>IGV (0%): S/ {formatMoney(0)}</div>
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
+        </div>
+
+        {/* ───── Footer con datos empresa ───── */}
+        <div style={styles.footer}>
+          <div style={styles.footerBlock}>
+            <div style={styles.footerStrong}>{empresa.nombre}</div>
+            {empresa.direccion && <div>{empresa.direccion}</div>}
+          </div>
+          <div style={styles.footerBlock}>
+            {empresa.telefono && <div>{empresa.telefono}</div>}
+            {empresa.correo && <div>{empresa.correo}</div>}
+            {empresa.web && <div>{empresa.web}</div>}
+          </div>
         </div>
       </div>
 
