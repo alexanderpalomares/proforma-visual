@@ -30,7 +30,6 @@ const convertToPngBase64 = (fileOrUrl) =>
     }
   });
 
-// ─────────────────── Estilos ESPEJO del PDF (ProformaPDF.jsx) ───────────────────
 const styles = {
   page: {
     width: 794,
@@ -40,42 +39,6 @@ const styles = {
     fontFamily: "Helvetica",
     color: "#000",
   },
-  headerContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottom: "1px solid #D9D9D9",
-  },
-  headerLeft: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  logo: { width: 87, height: 87, marginRight: 5 },
-  headerTextGroup: { color: "#000" },
-  empresaNombre: { fontWeight: 700, fontSize: 12.5 },
-  empresaDato: { fontSize: 12.5, lineHeight: 1.2 },
-  proformaBlock: { textAlign: "right" },
-  proformaTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    fontFamily: "Poppins",
-  },
-  proformaNumber: { fontSize: 13, marginTop: 2 },
-  proformaFecha: { fontSize: 13, color: "#000" },
-  clienteSection: {
-    paddingTop: 6,
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottom: "1px solid #E5E5E5",
-    lineHeight: 1.2,
-  },
-  clienteLabel: { fontWeight: 700, fontSize: 12.5, marginBottom: 2 },
-  clienteItem: { fontSize: 12.5, margin: "1px 0" },
   productosWrap: { display: "flex", flexDirection: "column" },
   productoRow: {
     display: "flex",
@@ -161,15 +124,6 @@ const styles = {
     fontSize: 15,
     marginTop: 4,
     lineHeight: 1.2,
-  },
-  footer: {
-    marginTop: 12,
-    paddingTop: 10,
-    fontSize: 9,
-    color: "#555",
-    lineHeight: 1.3,
-    textAlign: "justify",
-    borderTop: "2px solid #D0D0D0",
   },
   actions: {
     display: "flex",
@@ -314,39 +268,122 @@ export default function PrevisualizacionProforma({
       )}
 
       <div ref={ref} style={{ ...styles.page, textAlign: "left" }}>
-        <div style={styles.headerContainer}>
-          <div style={styles.headerLeft}>
-            {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
-            <div style={styles.headerTextGroup}>
-              <div style={styles.empresaNombre}>{empresa.nombre}</div>
-              <div style={styles.empresaDato}>{empresa.ruc}</div>
-              <div style={styles.empresaDato}>{empresa.direccion}</div>
-              {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
-              {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
-              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
+        {/* Encabezado modernizado */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            paddingBottom: 16,
+            marginBottom: 16,
+            borderBottom: "2px solid #eee",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "row", gap: 14 }}>
+            {empresa.logo && (
+              <img
+                src={empresa.logo}
+                alt="Logo"
+                style={{
+                  width: 90,
+                  height: 90,
+                  borderRadius: 12,
+                  objectFit: "cover",
+                }}
+              />
+            )}
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#111" }}>
+                {empresa.nombre}
+              </div>
+              <div style={{ fontSize: 13, color: "#555" }}>{empresa.ruc}</div>
+              <div style={{ fontSize: 13, color: "#555" }}>
+                {empresa.direccion}
+              </div>
+              {empresa.telefono && (
+                <div style={{ fontSize: 13, color: "#555" }}>
+                  Tel: {empresa.telefono}
+                </div>
+              )}
+              {empresa.correo && (
+                <div style={{ fontSize: 13, color: "#555" }}>
+                  {empresa.correo}
+                </div>
+              )}
+              {empresa.web && (
+                <div style={{ fontSize: 13, color: "#555" }}>{empresa.web}</div>
+              )}
             </div>
           </div>
 
-          <div style={styles.proformaBlock}>
-            <div style={styles.proformaTitle}>PROFORMA</div>
-            <div style={styles.proformaNumber}>N°: {numeroParaMostrar}</div>
-            {cliente.fecha && <div style={styles.proformaFecha}>Fecha: {cliente.fecha}</div>}
+          <div
+            style={{
+              backgroundColor: "#f3f4f6",
+              padding: "12px 20px",
+              borderRadius: 10,
+              textAlign: "right",
+              minWidth: 160,
+            }}
+          >
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#111" }}>
+              PROFORMA
+            </div>
+            <div style={{ fontSize: 13, color: "#333" }}>
+              N°: {numeroParaMostrar}
+            </div>
+            {cliente.fecha && (
+              <div style={{ fontSize: 13, color: "#333" }}>
+                📅 {cliente.fecha}
+              </div>
+            )}
           </div>
         </div>
 
-        <div style={styles.clienteSection}>
-          <div style={styles.clienteLabel}>Cliente</div>
-          {cliente.nombre && <div style={styles.clienteItem}>Nombre: {cliente.nombre}</div>}
-          {cliente.ruc && <div style={styles.clienteItem}>RUC: {cliente.ruc}</div>}
-          {cliente.direccion && <div style={styles.clienteItem}>Dirección: {cliente.direccion}</div>}
+        {/* Cliente modernizado */}
+        <div
+          style={{
+            backgroundColor: "#f9f9f9",
+            borderRadius: 10,
+            padding: "12px 16px",
+            marginBottom: 16,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 14,
+              marginBottom: 8,
+              color: "#111",
+            }}
+          >
+            Cliente
+          </div>
+          {cliente.nombre && (
+            <div style={{ fontSize: 13, marginBottom: 4, color: "#444" }}>
+              👤 {cliente.nombre}
+            </div>
+          )}
+          {cliente.ruc && (
+            <div style={{ fontSize: 13, marginBottom: 4, color: "#444" }}>
+              🆔 {cliente.ruc}
+            </div>
+          )}
+          {cliente.direccion && (
+            <div style={{ fontSize: 13, marginBottom: 4, color: "#444" }}>
+              📍 {cliente.direccion}
+            </div>
+          )}
         </div>
 
+        {/* Productos */}
         <div style={styles.productosWrap}>
           {productos.map((p, idx) => {
             const precio = Number(p.precio) || 0;
             const cantidad = Number(p.cantidad) || 0;
             const importe = precio * cantidad;
-            const tieneImagen = p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen;
+            const tieneImagen =
+              p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen;
 
             return (
               <div
@@ -359,7 +396,12 @@ export default function PrevisualizacionProforma({
                 <div style={styles.productoImgLeft}>
                   {tieneImagen && (
                     <img
-                      src={p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen}
+                      src={
+                        p.imagenForPdf ||
+                        p.imagenPreview ||
+                        p.imagenFile ||
+                        p.imagen
+                      }
                       alt={p.nombre || "Producto"}
                       style={styles.productoImgTag}
                     />
@@ -368,14 +410,18 @@ export default function PrevisualizacionProforma({
 
                 <div style={styles.productoDetails}>
                   <div style={styles.productoName}>{p.nombre}</div>
-                  {p.descripcion && <div style={styles.productoDesc}>{p.descripcion}</div>}
+                  {p.descripcion && (
+                    <div style={styles.productoDesc}>{p.descripcion}</div>
+                  )}
 
                   <div style={styles.grow} />
 
                   <div style={styles.priceBlock}>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Precio</div>
-                      <div style={styles.priceValue}>S/ {formatMoney(precio)}</div>
+                      <div style={styles.priceValue}>
+                        S/ {formatMoney(precio)}
+                      </div>
                     </div>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Cantidad</div>
@@ -383,7 +429,9 @@ export default function PrevisualizacionProforma({
                     </div>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Importe</div>
-                      <div style={styles.priceValue}>S/ {formatMoney(importe)}</div>
+                      <div style={styles.priceValue}>
+                        S/ {formatMoney(importe)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -393,7 +441,9 @@ export default function PrevisualizacionProforma({
         </div>
 
         <div style={styles.totalWrap}>
-          <div style={styles.totalText}>Subtotal: S/ {formatMoney(total)}</div>
+          <div style={styles.totalText}>
+            Subtotal: S/ {formatMoney(total)}
+          </div>
           <div style={styles.totalText}>IGV (0%): S/ {formatMoney(0)}</div>
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
         </div>
@@ -415,7 +465,11 @@ export default function PrevisualizacionProforma({
           {pdfStatus === "error" && "Error al generar PDF"}
         </button>
 
-        <button type="button" onClick={onVolver} style={{ ...styles.btn, ...styles.btnGray }}>
+        <button
+          type="button"
+          onClick={onVolver}
+          style={{ ...styles.btn, ...styles.btnGray }}
+        >
           Volver
         </button>
       </div>
