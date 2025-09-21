@@ -18,7 +18,7 @@ export default function Portada({ onComenzar }) {
         >
             {/* Logo */}
             <img
-                src="/proforma-preview.svg"   // 👈 o .svg si ese es el formato
+                src="/proforma-preview.png"
                 alt="Proforma preview"
                 style={{
                     width: 280,
