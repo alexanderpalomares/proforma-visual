@@ -44,7 +44,7 @@ export default function Portada({ onComenzar }) {
                 style={{
                     fontSize: "1.5rem",
                     fontWeight: "500",
-                    marginBottom: 24,
+                    marginBottom: 16,
                     color: "#333",
                 }}
             >
@@ -57,7 +57,7 @@ export default function Portada({ onComenzar }) {
                     fontSize: "1rem",
                     color: "#444",
                     maxWidth: 500,
-                    marginBottom: 32,
+                    marginBottom: 24,
                 }}
             >
                 Genera proformas profesionales con fotos de tus productos en segundos.
