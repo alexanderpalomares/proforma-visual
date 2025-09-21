@@ -36,7 +36,7 @@ export default function Portada({ onComenzar }) {
                     color: "#111",
                 }}
             >
-                Tu proforma con imágenes
+                Genera tu proforma con imágenes, en segundos
             </h1>
 
             {/* Subtítulo */}
@@ -60,8 +60,7 @@ export default function Portada({ onComenzar }) {
                     marginBottom: 32,
                 }}
             >
-                Genera proformas profesionales con fotos de tus productos en segundos.
-                Simple, visual y lista para enviar a tus clientes.
+                Simple, visual y profesional. Ideal para tus clientes
             </p>
 
             {/* Botón principal */}
