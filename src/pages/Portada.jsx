@@ -21,10 +21,11 @@ export default function Portada({ onComenzar }) {
                 src="/proforma-preview.svg"   // 👈 o .svg si ese es el formato
                 alt="Proforma preview"
                 style={{
-                    width: 120,
-                    height: 120,
+                    width: 280,
+                    height: "auto",
                     borderRadius: 16,
                     marginBottom: 24,
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
                 }}
             />
 
