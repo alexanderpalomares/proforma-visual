@@ -32,7 +32,7 @@ const convertToPngBase64 = (fileOrUrl) =>
     }
   });
 
-// ─────────────────── Estilos organizados ───────────────────
+// ─────────────────── Estilos ───────────────────
 const styles = {
   page: {
     width: 794,
@@ -43,29 +43,33 @@ const styles = {
     color: "#000",
   },
 
-  // Header
+  // Header Moderno
   header: {
     display: "flex",
-    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingBottom: 16,
-    marginBottom: 16,
-    borderBottom: "2px solid #eee",
+    marginBottom: 20,
   },
   headerLeft: { display: "flex", flexDirection: "row", gap: 14 },
-  logo: { width: 90, height: 90, borderRadius: 12, objectFit: "cover" },
-  empresaNombre: { fontSize: 16, fontWeight: 700, color: "#111" },
-  empresaDato: { fontSize: 13, color: "#555" },
-  proformaBox: {
-    backgroundColor: "#f3f4f6",
-    padding: "12px 20px",
-    borderRadius: 10,
-    textAlign: "right",
-    minWidth: 160,
+  logo: { width: 70, height: 70, borderRadius: "50%", objectFit: "cover" },
+  empresaNombre: {
+    fontSize: 16,
+    fontWeight: 700,
+    fontFamily: "Poppins, sans-serif",
+    color: "#111",
+    marginBottom: 4,
   },
-  proformaTitle: { fontSize: 16, fontWeight: 700, color: "#111" },
-  proformaNumber: { fontSize: 13, color: "#333" },
+  empresaDato: { fontSize: 13, color: "#555", marginBottom: 2 },
+
+  headerRight: { textAlign: "right" },
+  proformaTitle: {
+    fontSize: 18,
+    fontWeight: 700,
+    fontFamily: "Poppins, sans-serif",
+    color: "#1e293b",
+  },
+  proformaNumber: { fontSize: 13, color: "#334155", marginTop: 4 },
+  proformaDate: { fontSize: 13, color: "#334155", marginTop: 2 },
 
   // Cliente
   clienteBox: {
@@ -297,7 +301,7 @@ export default function PrevisualizacionProforma({
       )}
 
       <div ref={ref} style={styles.page}>
-        {/* ───── Header ───── */}
+        {/* ───── Header Moderno ───── */}
         <div style={styles.header}>
           <div style={styles.headerLeft}>
             {empresa.logo && (
@@ -305,24 +309,25 @@ export default function PrevisualizacionProforma({
             )}
             <div>
               <div style={styles.empresaNombre}>{empresa.nombre}</div>
-              <div style={styles.empresaDato}>{empresa.ruc}</div>
-              <div style={styles.empresaDato}>{empresa.direccion}</div>
+              {empresa.ruc && <div style={styles.empresaDato}>{empresa.ruc}</div>}
+              {empresa.direccion && (
+                <div style={styles.empresaDato}>{empresa.direccion}</div>
+              )}
               {empresa.telefono && (
-                <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>
+                <div style={styles.empresaDato}>{empresa.telefono}</div>
               )}
               {empresa.correo && (
                 <div style={styles.empresaDato}>{empresa.correo}</div>
               )}
-              {empresa.web && (
-                <div style={styles.empresaDato}>{empresa.web}</div>
-              )}
+              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
             </div>
           </div>
-          <div style={styles.proformaBox}>
+
+          <div style={styles.headerRight}>
             <div style={styles.proformaTitle}>PROFORMA</div>
             <div style={styles.proformaNumber}>N°: {numeroParaMostrar}</div>
             {cliente.fecha && (
-              <div style={styles.proformaNumber}>📅 {cliente.fecha}</div>
+              <div style={styles.proformaDate}>{cliente.fecha}</div>
             )}
           </div>
         </div>
