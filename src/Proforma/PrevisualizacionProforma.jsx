@@ -1,17 +1,15 @@
-// src/Proforma/PrevisualizacionProforma.jsx
 import React, { useMemo, useRef, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import ProformaPDF from "../pdf/ProformaPDF";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// ─────────────────── Formateo de dinero ───────────────────
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ─────────────────── Conversión de imágenes a PNG ───────────────────
+// ─────────────────── Función para convertir cualquier imagen a PNG ───────────────────
 const convertToPngBase64 = (fileOrUrl) =>
   new Promise((resolve, reject) => {
     try {
@@ -23,7 +21,7 @@ const convertToPngBase64 = (fileOrUrl) =>
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
+        resolve(canvas.toDataURL("image/png")); // convierte todo a PNG
       };
       img.onerror = (err) => reject(err);
       img.src = fileOrUrl;
@@ -32,7 +30,7 @@ const convertToPngBase64 = (fileOrUrl) =>
     }
   });
 
-// ─────────────────── Estilos ───────────────────
+// ─────────────────── Estilos ESPEJO del PDF (ProformaPDF.jsx) ───────────────────
 const styles = {
   page: {
     width: 794,
@@ -42,36 +40,42 @@ const styles = {
     fontFamily: "Helvetica",
     color: "#000",
   },
-
-  // Header minimalista
-  header: {
+  headerContainer: {
     display: "flex",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    paddingBottom: 10,
+    marginBottom: 10,
+    borderBottom: "1px solid #D9D9D9",
   },
-  logo: { width: 70, height: 70, borderRadius: "50%", objectFit: "cover" },
-  headerRight: { textAlign: "right" },
+  headerLeft: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  logo: { width: 87, height: 87, marginRight: 5 },
+  headerTextGroup: { color: "#000" },
+  empresaNombre: { fontWeight: 700, fontSize: 12.5 },
+  empresaDato: { fontSize: 12.5, lineHeight: 1.2 },
+  proformaBlock: { textAlign: "right" },
   proformaTitle: {
     fontSize: 18,
     fontWeight: 700,
-    fontFamily: "Poppins, sans-serif",
-    color: "#1e293b",
+    fontFamily: "Poppins",
   },
-  proformaNumber: { fontSize: 13, color: "#334155", marginTop: 4 },
-  proformaDate: { fontSize: 13, color: "#334155", marginTop: 2 },
-
-  // Cliente
-  clienteBox: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    padding: "12px 16px",
-    marginBottom: 16,
+  proformaNumber: { fontSize: 13, marginTop: 2 },
+  proformaFecha: { fontSize: 13, color: "#000" },
+  clienteSection: {
+    paddingTop: 6,
+    paddingBottom: 10,
+    marginBottom: 10,
+    borderBottom: "1px solid #E5E5E5",
+    lineHeight: 1.2,
   },
-  clienteLabel: { fontWeight: 700, fontSize: 14, marginBottom: 8, color: "#111" },
-  clienteDato: { fontSize: 13, marginBottom: 4, color: "#444" },
-
-  // Productos
+  clienteLabel: { fontWeight: 700, fontSize: 12.5, marginBottom: 2 },
+  clienteItem: { fontSize: 12.5, margin: "1px 0" },
   productosWrap: { display: "flex", flexDirection: "column" },
   productoRow: {
     display: "flex",
@@ -94,7 +98,11 @@ const styles = {
     overflow: "hidden",
     flexShrink: 0,
   },
-  productoImgTag: { width: "100%", height: "100%", objectFit: "contain" },
+  productoImgTag: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  },
   productoDetails: {
     display: "flex",
     flexDirection: "column",
@@ -119,6 +127,7 @@ const styles = {
     alignSelf: "flex-end",
     lineHeight: 1.2,
   },
+  grow: { flexGrow: 1 },
   priceBlock: {
     display: "flex",
     flexDirection: "row",
@@ -128,12 +137,24 @@ const styles = {
     width: "100%",
     flexWrap: "nowrap",
   },
-  priceItem: { minWidth: 120, textAlign: "right" },
-  priceLabel: { fontSize: 12, color: "#666", fontWeight: 700 },
-  priceValue: { fontSize: 14, fontWeight: 700 },
-
-  // Totales
-  totalWrap: { marginTop: 8, paddingTop: 8, borderTop: "1px solid #E5E5E5" },
+  priceItem: {
+    minWidth: 120,
+    textAlign: "right",
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: "#666",
+    fontWeight: 700,
+  },
+  priceValue: {
+    fontSize: 14,
+    fontWeight: 700,
+  },
+  totalWrap: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTop: "1px solid #E5E5E5",
+  },
   totalText: {
     textAlign: "right",
     fontWeight: 700,
@@ -141,34 +162,19 @@ const styles = {
     marginTop: 4,
     lineHeight: 1.2,
   },
-
-  // Footer moderno
   footer: {
-    marginTop: 32,
-    padding: "16px 0",
-    borderTop: "2px solid #f1f5f9",
-    display: "flex",
-    justifyContent: "center",
-    fontSize: 12,
-    color: "#475569",
-    gap: 40,
+    marginTop: 12,
+    paddingTop: 10,
+    fontSize: 9,
+    color: "#555",
+    lineHeight: 1.3,
+    textAlign: "justify",
+    borderTop: "2px solid #D0D0D0",
   },
-  footerBlock: {
-    textAlign: "center",
-    lineHeight: 1.4,
-  },
-  footerStrong: {
-    fontWeight: 700,
-    fontFamily: "Poppins, sans-serif",
-    color: "#111",
-  },
-
-  // Acciones
   actions: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "end",
     gap: 8,
-    marginTop: 16,
     marginBottom: 16,
   },
   btn: {
@@ -184,8 +190,6 @@ const styles = {
   btnBlue: { backgroundColor: "#2563eb" },
   btnRed: { backgroundColor: "#dc2626" },
   btnGray: { backgroundColor: "#6b7280" },
-
-  // Overlay éxito
   overlaySuccess: {
     position: "fixed",
     top: 0,
@@ -233,7 +237,6 @@ export default function PrevisualizacionProforma({
     }, 0);
   }, [productos]);
 
-  // ─────────────────── Generar PDF ───────────────────
   const handleExportPdfPro = async () => {
     try {
       setPdfStatus("loading");
@@ -250,7 +253,7 @@ export default function PrevisualizacionProforma({
             return { ...p, imagenForPdf };
           } catch (err) {
             console.error("Error al convertir imagen:", err);
-            return p;
+            return p; // fallback si falla la conversión
           }
         })
       );
@@ -272,6 +275,7 @@ export default function PrevisualizacionProforma({
       URL.revokeObjectURL(url);
 
       setPdfStatus("success");
+
       setTimeout(() => {
         setPdfStatus("idle");
         onLimpiarCliente?.();
@@ -296,7 +300,6 @@ export default function PrevisualizacionProforma({
 
   const numeroParaMostrar = numeroFinal ?? numeroPreview;
 
-  // ─────────────────── Render ───────────────────
   return (
     <div>
       <link
@@ -304,50 +307,46 @@ export default function PrevisualizacionProforma({
         rel="stylesheet"
       />
 
-      {/* Overlay de éxito */}
       {pdfStatus === "success" && (
         <div style={styles.overlaySuccess}>
           <div style={styles.successBox}>✅ PDF generado con éxito</div>
         </div>
       )}
 
-      <div ref={ref} style={styles.page}>
-        {/* ───── Header ───── */}
-        <div style={styles.header}>
-          {empresa.logo && (
-            <img src={empresa.logo} alt="Logo" style={styles.logo} />
-          )}
-          <div style={styles.headerRight}>
+      <div ref={ref} style={{ ...styles.page, textAlign: "left" }}>
+        <div style={styles.headerContainer}>
+          <div style={styles.headerLeft}>
+            {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
+            <div style={styles.headerTextGroup}>
+              <div style={styles.empresaNombre}>{empresa.nombre}</div>
+              <div style={styles.empresaDato}>{empresa.ruc}</div>
+              <div style={styles.empresaDato}>{empresa.direccion}</div>
+              {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
+              {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
+              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
+            </div>
+          </div>
+
+          <div style={styles.proformaBlock}>
             <div style={styles.proformaTitle}>PROFORMA</div>
             <div style={styles.proformaNumber}>N°: {numeroParaMostrar}</div>
-            {cliente.fecha && (
-              <div style={styles.proformaDate}>{cliente.fecha}</div>
-            )}
+            {cliente.fecha && <div style={styles.proformaFecha}>Fecha: {cliente.fecha}</div>}
           </div>
         </div>
 
-        {/* ───── Cliente ───── */}
-        <div style={styles.clienteBox}>
+        <div style={styles.clienteSection}>
           <div style={styles.clienteLabel}>Cliente</div>
-          {cliente.nombre && (
-            <div style={styles.clienteDato}>👤 {cliente.nombre}</div>
-          )}
-          {cliente.ruc && (
-            <div style={styles.clienteDato}>🆔 {cliente.ruc}</div>
-          )}
-          {cliente.direccion && (
-            <div style={styles.clienteDato}>📍 {cliente.direccion}</div>
-          )}
+          {cliente.nombre && <div style={styles.clienteItem}>Nombre: {cliente.nombre}</div>}
+          {cliente.ruc && <div style={styles.clienteItem}>RUC: {cliente.ruc}</div>}
+          {cliente.direccion && <div style={styles.clienteItem}>Dirección: {cliente.direccion}</div>}
         </div>
 
-        {/* ───── Productos ───── */}
         <div style={styles.productosWrap}>
           {productos.map((p, idx) => {
             const precio = Number(p.precio) || 0;
             const cantidad = Number(p.cantidad) || 0;
             const importe = precio * cantidad;
-            const tieneImagen =
-              p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen;
+            const tieneImagen = p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen;
 
             return (
               <div
@@ -360,12 +359,7 @@ export default function PrevisualizacionProforma({
                 <div style={styles.productoImgLeft}>
                   {tieneImagen && (
                     <img
-                      src={
-                        p.imagenForPdf ||
-                        p.imagenPreview ||
-                        p.imagenFile ||
-                        p.imagen
-                      }
+                      src={p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen}
                       alt={p.nombre || "Producto"}
                       style={styles.productoImgTag}
                     />
@@ -374,16 +368,14 @@ export default function PrevisualizacionProforma({
 
                 <div style={styles.productoDetails}>
                   <div style={styles.productoName}>{p.nombre}</div>
-                  {p.descripcion && (
-                    <div style={styles.productoDesc}>{p.descripcion}</div>
-                  )}
-                  <div style={{ flexGrow: 1 }} />
+                  {p.descripcion && <div style={styles.productoDesc}>{p.descripcion}</div>}
+
+                  <div style={styles.grow} />
+
                   <div style={styles.priceBlock}>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Precio</div>
-                      <div style={styles.priceValue}>
-                        S/ {formatMoney(precio)}
-                      </div>
+                      <div style={styles.priceValue}>S/ {formatMoney(precio)}</div>
                     </div>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Cantidad</div>
@@ -391,9 +383,7 @@ export default function PrevisualizacionProforma({
                     </div>
                     <div style={styles.priceItem}>
                       <div style={styles.priceLabel}>Importe</div>
-                      <div style={styles.priceValue}>
-                        S/ {formatMoney(importe)}
-                      </div>
+                      <div style={styles.priceValue}>S/ {formatMoney(importe)}</div>
                     </div>
                   </div>
                 </div>
@@ -402,29 +392,17 @@ export default function PrevisualizacionProforma({
           })}
         </div>
 
-        {/* ───── Totales ───── */}
         <div style={styles.totalWrap}>
           <div style={styles.totalText}>Subtotal: S/ {formatMoney(total)}</div>
           <div style={styles.totalText}>IGV (0%): S/ {formatMoney(0)}</div>
           <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
         </div>
-
-        {/* ───── Footer con datos empresa ───── */}
-        <div style={styles.footer}>
-          <div style={styles.footerBlock}>
-            <div style={styles.footerStrong}>{empresa.nombre}</div>
-            {empresa.direccion && <div>{empresa.direccion}</div>}
-          </div>
-          <div style={styles.footerBlock}>
-            {empresa.telefono && <div>{empresa.telefono}</div>}
-            {empresa.correo && <div>{empresa.correo}</div>}
-            {empresa.web && <div>{empresa.web}</div>}
-          </div>
-        </div>
       </div>
 
-      {/* ───── Acciones ───── */}
-      <div className="print:hidden" style={styles.actions}>
+      <div
+        className="print:hidden"
+        style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}
+      >
         <button
           type="button"
           onClick={handleExportPdfPro}
@@ -437,11 +415,7 @@ export default function PrevisualizacionProforma({
           {pdfStatus === "error" && "Error al generar PDF"}
         </button>
 
-        <button
-          type="button"
-          onClick={onVolver}
-          style={{ ...styles.btn, ...styles.btnGray }}
-        >
+        <button type="button" onClick={onVolver} style={{ ...styles.btn, ...styles.btnGray }}>
           Volver
         </button>
       </div>
