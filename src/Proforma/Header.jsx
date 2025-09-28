@@ -17,8 +17,8 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       gap: 12,
     },
     logoBox: {
-      width: 60, // 🔑 ancho fijo
-      height: 60, // 🔑 alto fijo
+      width: 70, // 🔑 ancho fijo
+      height: 70, // 🔑 alto fijo
       borderRadius: 10,
       border: "1px solid #E5E5E5",
       background: "#fafafa",
