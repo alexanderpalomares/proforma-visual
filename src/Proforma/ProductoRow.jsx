@@ -24,7 +24,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
       justifyContent: "center",
       overflow: "hidden",
       flexShrink: 0,
-      background: "#fafafa",
+      background: "#ffffff",
     },
     img: { width: "100%", height: "100%", objectFit: "contain" },
     details: {
