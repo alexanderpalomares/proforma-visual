@@ -6,10 +6,10 @@ import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeraci
 
 // Bloques refactorizados (HTML normal, no react-pdf)
 import Header from "./Header";
-import ClienteInfo from "./ClienteInfo";
+// import ClienteInfo from "./ClienteInfo";   // ⬅️ Comentado
 import ProductoRow from "./ProductoRow";
-import Totales from "./Totales";
-import Footer from "./Footer";
+// import Totales from "./Totales";          // ⬅️ Comentado
+// import Footer from "./Footer";            // ⬅️ Comentado
 
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
@@ -129,7 +129,8 @@ export default function PrevisualizacionProforma({
 
       <div ref={ref} style={styles.page}>
         <Header empresa={empresa} numeroProforma={numeroParaMostrar} fecha={cliente.fecha} />
-        <ClienteInfo cliente={cliente} />
+
+        {/* <ClienteInfo cliente={cliente} /> */} {/* ⬅️ Comentado */}
 
         <div style={styles.productosWrap}>
           {productos.map((p, idx) => (
@@ -137,8 +138,8 @@ export default function PrevisualizacionProforma({
           ))}
         </div>
 
-        <Totales total={total} formatMoney={formatMoney} />
-        <Footer />
+        {/* <Totales total={total} formatMoney={formatMoney} /> */} {/* ⬅️ Comentado */}
+        {/* <Footer /> */} {/* ⬅️ Comentado */}
       </div>
 
       {/* Botones de acción */}
