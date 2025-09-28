@@ -54,14 +54,18 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         priceBlock: {
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between", // mejor distribución dentro del ancho fijo
-            gap: 12,
+            justifyContent: "space-between", // reparte los 3 items
             marginTop: 8,
-            width: 280,                      // mismo ancho que la descripción
-            alignSelf: "flex-end",           // pegado a la derecha
+            maxWidth: 280,                    // mismo límite que la descripción
+            width: "100%",
+            alignSelf: "flex-end",
+        },
+
+        priceItem: {
+            flex: 1,              // cada item ocupa el mismo espacio
+            textAlign: "right",
         },
         
-        priceItem: { minWidth: 100, textAlign: "right" },
         priceLabel: { fontSize: 12, fontWeight: 600, color: "#666" },
         priceValue: { fontSize: 13, fontWeight: 700 },
     };
