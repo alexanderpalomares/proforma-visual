@@ -4,7 +4,7 @@ import { pdf } from "@react-pdf/renderer";
 import ProformaPDF from "../pdf/ProformaPDF";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// Bloques refactorizados (HTML normal, no react-pdf)
+// Bloques refactorizados
 import Header from "./Header";
 import ClienteInfo from "./ClienteInfo";
 import ProductoRow from "./ProductoRow";
@@ -97,7 +97,9 @@ export default function PrevisualizacionProforma({
   empresa = {},
   cliente = {},
   productos = [],
-  tipoDocumento = "PROFORMA", // 👈 nuevo
+  tipoDocumento = "PROFORMA",
+  observaciones = "",
+  banco = {},
   onVolver = () => {},
   onLimpiarCliente = () => {},
   onLimpiarProductos = () => {},
@@ -142,14 +144,16 @@ export default function PrevisualizacionProforma({
           cliente={cliente}
           productos={productosReady}
           numeroProforma={numero}
-          tipoDocumento={tipoDocumento} // 👈 pasamos el tipo al PDF
+          tipoDocumento={tipoDocumento}
+          observaciones={observaciones}
+          banco={banco}
         />
       ).toBlob();
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${tipoDocumento}_${numero}.pdf`; // 👈 nombre dinámico
+      a.download = `${tipoDocumento}_${numero}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -197,7 +201,7 @@ export default function PrevisualizacionProforma({
           empresa={empresa}
           numero={numeroParaMostrar}
           fecha={cliente.fecha}
-          tipoDocumento={tipoDocumento} // 👈 nuevo
+          tipoDocumento={tipoDocumento}
         />
 
         {/* CLIENTE */}
@@ -214,7 +218,7 @@ export default function PrevisualizacionProforma({
         <Totales total={total} formatMoney={formatMoney} />
 
         {/* FOOTER */}
-        <Footer empresa={empresa} />
+        <Footer empresa={empresa} observaciones={observaciones} banco={banco} />
       </div>
 
       <div className="print:hidden" style={styles.actions}>

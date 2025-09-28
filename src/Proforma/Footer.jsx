@@ -1,7 +1,6 @@
-// src/Proforma/Footer.jsx
 import React from "react";
 
-export default function Footer() {
+export default function Footer({ empresa = {}, observaciones = "", banco = {} }) {
   const styles = {
     wrap: {
       marginTop: 20,
@@ -15,9 +14,11 @@ export default function Footer() {
       justifyContent: "space-between",
       gap: 20,
       textAlign: "left",
+      flexWrap: "wrap", // ✅ responsivo
     },
     col: {
       flex: 1,
+      minWidth: 220, // asegura buena visualización en pantallas pequeñas
     },
     title: {
       fontWeight: 600,
@@ -29,34 +30,50 @@ export default function Footer() {
       margin: 0,
       lineHeight: 1.4,
     },
+    final: {
+      marginTop: 12,
+      textAlign: "center",
+      fontSize: 11,
+      color: "#333",
+    },
   };
 
   return (
     <div style={styles.wrap}>
       <div style={styles.columns}>
-        {/* Observaciones / Contacto */}
+        {/* Observaciones */}
         <div style={styles.col}>
           <div style={styles.title}>Observaciones:</div>
-          <p style={styles.text}>La entrega está sujeta a disponibilidad de stock.</p>
-          <p style={styles.text}>Consultas: ventas@kikeferreteria.pe</p>
-          <p style={styles.text}>Tel: +51 987 654 321</p>
+          <p style={styles.text}>
+            {observaciones && observaciones.trim() !== ""
+              ? observaciones
+              : "Sin observaciones"}
+          </p>
         </div>
 
-        {/* Información de pago */}
+        {/* Datos Bancarios */}
         <div style={styles.col}>
           <div style={styles.title}>Datos Bancarios:</div>
-          <p style={styles.text}>Cuenta Corriente BCP: 123-4567890-0-11</p>
-          <p style={styles.text}>CCI: 00212300456789001199</p>
-          <p style={styles.text}>Titular: Proveedores del Oriente E.I.R.L.</p>
+          {banco?.cuenta && <p style={styles.text}>Cuenta: {banco.cuenta}</p>}
+          {banco?.cci && <p style={styles.text}>CCI: {banco.cci}</p>}
+          {banco?.titular && <p style={styles.text}>Titular: {banco.titular}</p>}
+          {!banco?.cuenta && !banco?.cci && !banco?.titular && (
+            <p style={styles.text}>No se registraron datos bancarios</p>
+          )}
         </div>
 
-        {/* Términos y condiciones */}
+        {/* Términos y Condiciones */}
         <div style={styles.col}>
           <div style={styles.title}>Términos y Condiciones:</div>
           <p style={styles.text}>- Los precios son válidos por 7 días.</p>
-          <p style={styles.text}>- Garantía solo aplica a defectos de fábrica.</p>
+          <p style={styles.text}>- La garantía aplica solo a defectos de fábrica.</p>
           <p style={styles.text}>- No se aceptan devoluciones sin comprobante.</p>
         </div>
+      </div>
+
+      {/* Mensaje final */}
+      <div style={styles.final}>
+        Gracias por confiar en <strong>{empresa?.nombre || "Nuestra empresa"}</strong>.
       </div>
     </div>
   );

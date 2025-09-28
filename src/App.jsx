@@ -4,50 +4,56 @@ import SectionCard from "./Proforma/SectionCard";
 import FormularioEmpresa from "./Proforma/FormularioEmpresa";
 import FormularioCliente from "./Proforma/FormularioCliente";
 import FormularioProductosMultiples from "./Proforma/FormularioProductosMultiples";
+import FormularioTipoDocumento from "./Proforma/FormularioTipoDocumento";
+import FormularioFooter from "./Proforma/FormularioFooter"; // 👈 nuevo
 import PrevisualizacionProforma from "./Proforma/PrevisualizacionProforma";
-import FormularioTipoDocumento from "./Proforma/FormularioTipoDocumento"; // 👈 nuevo
-import Portada from "./pages/Portada"; // 👈 Importamos la portada
+import Portada from "./pages/Portada";
 
 function App() {
-  const [mostrarPortada, setMostrarPortada] = useState(true); 
-  const [empresa, setEmpresa] = useState({
-    nombre: "",
-    ruc: "",
-    direccion: "",
-    telefono: "",
-    correo: "",
-    instagram: "",
-    logo: ""
-  });
-
-  const [cliente, setCliente] = useState({
-    nombre: "",
-    ruc: "",
-    direccion: "",
-    fecha: ""
-  });
-
-  const [productos, setProductos] = useState([]);
+  const [mostrarPortada, setMostrarPortada] = useState(true);
   const [mostrarPrevisualizacion, setMostrarPrevisualizacion] = useState(false);
 
-  // 👇 nuevo estado para tipo de documento
-  const [tipoDocumento, setTipoDocumento] = useState("PROFORMA");
+  // 🔹 Estado global único
+  const [formData, setFormData] = useState({
+    empresa: {
+      nombre: "",
+      ruc: "",
+      direccion: "",
+      telefono: "",
+      correo: "",
+      instagram: "",
+      logo: "",
+    },
+    cliente: {
+      nombre: "",
+      ruc: "",
+      direccion: "",
+      fecha: "",
+    },
+    productos: [],
+    tipoDocumento: "PROFORMA",
+    observaciones: "",
+    cuentaBancaria: "",
+    cci: "",
+    titular: "",
+  });
 
   // Funciones
   const abrirPrevisualizacion = () => setMostrarPrevisualizacion(true);
   const cerrarPrevisualizacion = () => setMostrarPrevisualizacion(false);
 
   const limpiarCliente = () => {
-    setCliente({
-      nombre: "",
-      ruc: "",
-      direccion: "",
-      fecha: ""
-    });
+    setFormData((prev) => ({
+      ...prev,
+      cliente: { nombre: "", ruc: "", direccion: "", fecha: "" },
+    }));
   };
 
   const limpiarProductos = () => {
-    setProductos([]);
+    setFormData((prev) => ({
+      ...prev,
+      productos: [],
+    }));
   };
 
   return (
@@ -58,39 +64,66 @@ function App() {
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
           {!mostrarPrevisualizacion ? (
             <>
+              {/* Empresa y Cliente */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SectionCard title="Ingresa los datos de tu empresa" className="h-full">
-                  <FormularioEmpresa empresa={empresa} setEmpresa={setEmpresa} />
+                  <FormularioEmpresa
+                    empresa={formData.empresa}
+                    setEmpresa={(empresa) =>
+                      setFormData((prev) => ({ ...prev, empresa }))
+                    }
+                  />
                 </SectionCard>
 
                 <SectionCard title="Ingresa los datos de tu cliente" className="h-full">
-                  <FormularioCliente cliente={cliente} setCliente={setCliente} />
+                  <FormularioCliente
+                    cliente={formData.cliente}
+                    setCliente={(cliente) =>
+                      setFormData((prev) => ({ ...prev, cliente }))
+                    }
+                  />
                 </SectionCard>
               </div>
 
-              {/* 👇 nuevo bloque: elegir tipo de documento */}
+              {/* Tipo de Documento */}
               <SectionCard title="Selecciona el tipo de documento" className="col-span-2">
-                <FormularioTipoDocumento 
-                  tipoDocumento={tipoDocumento} 
-                  setTipoDocumento={setTipoDocumento} 
+                <FormularioTipoDocumento
+                  tipoDocumento={formData.tipoDocumento}
+                  setTipoDocumento={(tipoDocumento) =>
+                    setFormData((prev) => ({ ...prev, tipoDocumento }))
+                  }
                 />
               </SectionCard>
 
+              {/* Productos */}
               <SectionCard title="Ingresa tus productos" className="col-span-2">
                 <FormularioProductosMultiples
-                  cliente={cliente}
-                  productos={productos}
-                  setProductos={setProductos}
+                  cliente={formData.cliente}
+                  productos={formData.productos}
+                  setProductos={(productos) =>
+                    setFormData((prev) => ({ ...prev, productos }))
+                  }
                   manejarMostrarPrevisualizacion={abrirPrevisualizacion}
                 />
+              </SectionCard>
+
+              {/* Observaciones y Bancos */}
+              <SectionCard title="Observaciones y Datos Bancarios" className="col-span-2">
+                <FormularioFooter formData={formData} setFormData={setFormData} />
               </SectionCard>
             </>
           ) : (
             <PrevisualizacionProforma
-              empresa={empresa}
-              cliente={cliente}
-              productos={productos}
-              tipoDocumento={tipoDocumento}   // 👈 pasamos el tipo
+              empresa={formData.empresa}
+              cliente={formData.cliente}
+              productos={formData.productos}
+              tipoDocumento={formData.tipoDocumento}
+              observaciones={formData.observaciones}
+              banco={{
+                cuenta: formData.cuentaBancaria,
+                cci: formData.cci,
+                titular: formData.titular,
+              }}
               onVolver={cerrarPrevisualizacion}
               onLimpiarCliente={limpiarCliente}
               onLimpiarProductos={limpiarProductos}
