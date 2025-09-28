@@ -6,7 +6,7 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
     "w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
 
   const onChange = (e) =>
-    setEmpresa((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setEmpresa({ [e.target.name]: e.target.value }); // ✅ pasa solo el campo
 
   // Permite subir archivo y guarda DataURL en empresa.logo
   const onLogoFile = (e) => {
@@ -14,14 +14,14 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setEmpresa((prev) => ({ ...prev, logo: reader.result })); // DataURL
+      setEmpresa({ logo: reader.result }); // ✅ solo actualiza logo
     };
     reader.readAsDataURL(file);
   };
 
   const limpiarLogo = () => {
     if (fileRef.current) fileRef.current.value = "";
-    setEmpresa((prev) => ({ ...prev, logo: "" }));
+    setEmpresa({ logo: "" }); // ✅ solo limpia logo
   };
 
   return (
@@ -39,11 +39,9 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="20601648391"
         value={empresa.ruc || ""}
         onChange={(e) =>
-          // solo números, máx 11
-          setEmpresa((p) => ({
-            ...p,
+          setEmpresa({
             ruc: e.target.value.replace(/\D/g, "").slice(0, 11),
-          }))
+          })
         }
       />
       <input
@@ -59,11 +57,9 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
         placeholder="987916570"
         value={empresa.telefono || ""}
         onChange={(e) =>
-          // deja + y dígitos
-          setEmpresa((p) => ({
-            ...p,
+          setEmpresa({
             telefono: e.target.value.replace(/[^\d+]/g, ""),
-          }))
+          })
         }
       />
       <input
@@ -84,7 +80,6 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
       {/* Subida de logo en cuadro cuadrado */}
       <div className="md:col-span-2">
         <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
-          {/* Input invisible detrás */}
           <input
             ref={fileRef}
             type="file"
@@ -101,7 +96,6 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
                 className="w-full h-full object-contain z-10 pointer-events-none"
               />
 
-              {/* Botón X arriba a la derecha */}
               <button
                 type="button"
                 aria-label="Quitar logo"

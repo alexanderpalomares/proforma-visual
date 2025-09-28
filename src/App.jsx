@@ -1,11 +1,10 @@
-// App.jsx
 import React, { useState } from "react";
 import SectionCard from "./Proforma/SectionCard";
 import FormularioEmpresa from "./Proforma/FormularioEmpresa";
 import FormularioCliente from "./Proforma/FormularioCliente";
 import FormularioProductosMultiples from "./Proforma/FormularioProductosMultiples";
 import FormularioTipoDocumento from "./Proforma/FormularioTipoDocumento";
-import FormularioFooter from "./Proforma/FormularioFooter"; // 👈 nuevo
+import FormularioFooter from "./Proforma/FormularioFooter"; 
 import PrevisualizacionProforma from "./Proforma/PrevisualizacionProforma";
 import Portada from "./pages/Portada";
 
@@ -23,6 +22,7 @@ function App() {
       correo: "",
       instagram: "",
       logo: "",
+      web: "",
     },
     cliente: {
       nombre: "",
@@ -69,8 +69,11 @@ function App() {
                 <SectionCard title="Ingresa los datos de tu empresa" className="h-full">
                   <FormularioEmpresa
                     empresa={formData.empresa}
-                    setEmpresa={(empresa) =>
-                      setFormData((prev) => ({ ...prev, empresa }))
+                    setEmpresa={(partialEmpresa) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        empresa: { ...prev.empresa, ...partialEmpresa }, // ✅ fusiona cambios
+                      }))
                     }
                   />
                 </SectionCard>
