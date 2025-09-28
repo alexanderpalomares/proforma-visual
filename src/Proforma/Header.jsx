@@ -1,65 +1,50 @@
 // src/Proforma/Header.jsx
 import React from "react";
 
-export default function Header({ empresa, numero, fecha, cliente }) {
+export default function Header({ empresa, numero, fecha }) {
   const styles = {
     container: {
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "flex-start",
+      alignItems: "center",
       paddingBottom: 10,
       marginBottom: 10,
-      borderBottom: "1px solid #E5E5E5",
+      borderBottom: "1px solid #D9D9D9",
     },
     left: {
       display: "flex",
-      flexDirection: "column",
-      gap: 2,
-      color: "#000",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
     },
-    clienteNombre: {
-      fontWeight: 700,
-      fontSize: 18,
-      textTransform: "uppercase",
-    },
-    clienteDato: {
-      fontSize: 12,
-      lineHeight: 1.4,
-    },
-    right: {
-      textAlign: "right",
-    },
-    proformaTitle: {
-      fontSize: 16,
-      fontWeight: 700,
-      fontFamily: "Poppins, sans-serif",
-    },
-    proformaNumber: {
-      fontSize: 12,
-      fontWeight: 600,
-      marginTop: 2,
-    },
-    proformaFecha: {
-      fontSize: 12,
-      color: "#333",
-      marginTop: 2,
-    },
+    logo: { width: 70, height: 70, objectFit: "contain", marginRight: 8 },
+    textGroup: { color: "#000" },
+    empresaNombre: { fontWeight: 700, fontSize: 14 },
+    empresaDato: { fontSize: 12, lineHeight: 1.3 },
+    right: { textAlign: "right" },
+    title: { fontSize: 18, fontWeight: 700, fontFamily: "Poppins" },
+    number: { fontSize: 13, marginTop: 2 },
+    fecha: { fontSize: 13 },
   };
 
   return (
     <div style={styles.container}>
-      {/* Datos del cliente */}
       <div style={styles.left}>
-        {cliente?.nombre && <div style={styles.clienteNombre}>{cliente.nombre}</div>}
-        {cliente?.ruc && <div style={styles.clienteDato}>{cliente.ruc}</div>}
-        {cliente?.direccion && <div style={styles.clienteDato}>{cliente.direccion}</div>}
+        {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
+        <div style={styles.textGroup}>
+          <div style={styles.empresaNombre}>{empresa.nombre}</div>
+          {empresa.ruc && <div style={styles.empresaDato}>{empresa.ruc}</div>}
+          {empresa.direccion && <div style={styles.empresaDato}>{empresa.direccion}</div>}
+          {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
+          {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
+          {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
+        </div>
       </div>
 
-      {/* Datos de la proforma */}
       <div style={styles.right}>
-        <div style={styles.proformaTitle}>PROFORMA</div>
-        <div style={styles.proformaNumber}>N°: {numero}</div>
-        {fecha && <div style={styles.proformaFecha}>{fecha}</div>}
+        <div style={styles.title}>PROFORMA</div>
+        <div style={styles.number}>N°: {numero}</div>
+        {fecha && <div style={styles.fecha}>Fecha: {fecha}</div>}
       </div>
     </div>
   );
