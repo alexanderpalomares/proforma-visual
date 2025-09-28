@@ -28,7 +28,7 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.1,
+      lineHeight: 1,
     },
     empresaNombre: {
       fontWeight: 700,
