@@ -28,17 +28,17 @@ export default function Header({ empresa, numero, fecha }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.1, // compacto
+      lineHeight: 1, // compacto
       fontSize: 12,
       color: "#111",
     },
     empresaNombre: {
       fontWeight: 800, // extra bold
       fontSize: 14,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     empresaDato: {
-      fontSize: 11,
+      fontSize: 12,
       color: "#333",
     },
     // Bloque derecho (Proforma)
