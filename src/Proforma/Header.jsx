@@ -7,42 +7,45 @@ export default function Header({ empresa, numero, fecha }) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      paddingBottom: 10,
-      marginBottom: 10,
-      borderBottom: "1px solid #E5E5E5",
+      paddingBottom: 16,
+      marginBottom: 20,
+      borderBottom: "2px solid #E5E5E5",
     },
     left: {
       fontWeight: 700,
-      fontSize: 18,
+      fontSize: 20,
       textTransform: "uppercase",
-      color: "#000",
+      color: "#111",
+      letterSpacing: "0.5px",
     },
     right: {
       textAlign: "right",
     },
     proformaTitle: {
-      fontSize: 16,
+      fontSize: 20,
       fontWeight: 700,
       fontFamily: "Poppins, sans-serif",
+      marginBottom: 4,
+      color: "#111",
     },
     proformaNumber: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: 600,
-      marginTop: 2,
+      marginBottom: 2,
+      color: "#2563eb", // azul corporativo, puedes cambiarlo
     },
     proformaFecha: {
       fontSize: 12,
-      color: "#333",
-      marginTop: 2,
+      color: "#666",
     },
   };
 
   return (
     <div style={styles.container}>
-      {/* Nombre de la empresa emisora */}
+      {/* Empresa emisora */}
       <div style={styles.left}>{empresa?.nombre || "NOMBRE DE EMPRESA"}</div>
 
-      {/* Bloque de Proforma */}
+      {/* Proforma info */}
       <div style={styles.right}>
         <div style={styles.proformaTitle}>PROFORMA</div>
         {numero && <div style={styles.proformaNumber}>N°: {numero}</div>}
