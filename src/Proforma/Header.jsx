@@ -11,7 +11,7 @@ export default function Header({ empresa, numero, fecha }) {
       marginBottom: 10,
       borderBottom: "1px solid #D9D9D9",
     },
-    // Bloque de empresa (logo + datos)
+    // Bloque de empresa
     empresaBlock: {
       display: "flex",
       flexDirection: "row",
@@ -19,29 +19,29 @@ export default function Header({ empresa, numero, fecha }) {
       gap: 12,
     },
     logo: {
-      width: 80,
-      height: 80,
+      width: 60,
+      height: 60,
       objectFit: "contain",
-      borderRadius: 10, // bordes suaves
+      borderRadius: 10, // bordes suavizados
     },
     textGroup: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.2,
+      lineHeight: 1.1, // compacto
       fontSize: 12,
       color: "#111",
     },
     empresaNombre: {
-      fontWeight: 700,
+      fontWeight: 800, // extra bold
       fontSize: 14,
-      marginBottom: 1,
+      marginBottom: 2,
     },
     empresaDato: {
-      fontSize: 12,
+      fontSize: 11,
       color: "#333",
     },
-    // Bloque derecho (proforma)
+    // Bloque derecho (Proforma)
     right: {
       textAlign: "right",
     },
