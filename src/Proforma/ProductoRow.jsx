@@ -31,12 +31,12 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         details: {
             display: "flex",
             flexDirection: "column",
-            justifyContent: "flex-start",
+            alignItems: "flex-end",
             maxWidth: 300, // 🔥 descripción más compacta
             lineHeight: 1.4,
             flexShrink: 0,
         },
-        
+
         name: {
             fontFamily: "Poppins, sans-serif",
             fontWeight: 700,
