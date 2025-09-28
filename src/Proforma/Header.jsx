@@ -1,55 +1,52 @@
 // src/Proforma/Header.jsx
 import React from "react";
 
-export default function Header({ empresa, numero, fecha }) {
+export default function Header({ empresa, titulo = "PROFORMA", numero, fecha }) {
   const styles = {
     container: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      paddingBottom: 16,
-      marginBottom: 20,
-      borderBottom: "2px solid #E5E5E5",
+      backgroundColor: "#2563eb", // azul corporativo
+      color: "#fff",
+      padding: "16px 24px",
+      borderRadius: 4,
     },
     left: {
       fontWeight: 700,
       fontSize: 20,
       textTransform: "uppercase",
-      color: "#111",
       letterSpacing: "0.5px",
     },
     right: {
       textAlign: "right",
     },
-    proformaTitle: {
-      fontSize: 20,
+    titulo: {
       fontWeight: 700,
-      fontFamily: "Poppins, sans-serif",
+      fontSize: 18,
+      textTransform: "uppercase",
       marginBottom: 4,
-      color: "#111",
     },
-    proformaNumber: {
+    numero: {
       fontSize: 13,
       fontWeight: 600,
-      marginBottom: 2,
-      color: "#2563eb", // azul corporativo, puedes cambiarlo
     },
-    proformaFecha: {
+    fecha: {
       fontSize: 12,
-      color: "#666",
+      opacity: 0.9,
     },
   };
 
   return (
     <div style={styles.container}>
-      {/* Empresa emisora */}
+      {/* Nombre de la empresa */}
       <div style={styles.left}>{empresa?.nombre || "NOMBRE DE EMPRESA"}</div>
 
-      {/* Proforma info */}
+      {/* Título, número y fecha */}
       <div style={styles.right}>
-        <div style={styles.proformaTitle}>PROFORMA</div>
-        {numero && <div style={styles.proformaNumber}>N°: {numero}</div>}
-        {fecha && <div style={styles.proformaFecha}>{fecha}</div>}
+        <div style={styles.titulo}>{titulo}</div>
+        {numero && <div style={styles.numero}>N°: {numero}</div>}
+        {fecha && <div style={styles.fecha}>{fecha}</div>}
       </div>
     </div>
   );
