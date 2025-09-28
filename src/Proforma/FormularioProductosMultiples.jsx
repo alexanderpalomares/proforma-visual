@@ -99,12 +99,11 @@ export default function FormularioProductosMultiples({
     <div className="space-y-4">
       {/* Dropzone intuitivo con drag & drop */}
       <div>
-        
+
 
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer relative transition ${
-            isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-          }`}
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer relative transition ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+            }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -173,6 +172,11 @@ export default function FormularioProductosMultiples({
                       onChange={(e) => handleChange(p.id, "nombre", e.target.value)}
                       className="w-full border rounded px-3 py-2"
                     />
+
+                    <p className="text-xs text-gray-500 mt-1">
+                      {p.nombre.length}/30 caracteres
+                    </p>
+                    
                   </div>
 
                   <div className="md:col-span-2">
