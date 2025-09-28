@@ -14,7 +14,7 @@ export default function Header({ empresa, titulo = "PROFORMA", numero, fecha }) 
     },
     left: {
       fontWeight: 700,
-      fontSize: 20,
+      fontSize: 30,
       textTransform: "uppercase",
       letterSpacing: "0.5px",
     },
