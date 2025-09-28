@@ -1,54 +1,50 @@
 // src/Proforma/Header.jsx
 import React from "react";
 
-export default function Header({ empresa, titulo = "PROFORMA", numero, fecha }) {
+export default function Header({ empresa, numero, fecha }) {
   const styles = {
     container: {
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "flex-start",
-      backgroundColor: "#f3f4f6", // gris muy claro (neutral)
-      color: "#111", // 👈 texto oscuro
-      padding: "16px 24px",
-      borderRadius: 4,
-      border: "1px solid #e5e7eb", // borde sutil para dar estructura
+      alignItems: "center",
+      paddingBottom: 10,
+      marginBottom: 10,
+      borderBottom: "1px solid #D9D9D9",
     },
     left: {
-      fontWeight: 700,
-      fontSize: 20,
-      textTransform: "uppercase",
-      letterSpacing: "0.5px",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
     },
-    right: {
-      textAlign: "right",
-    },
-    titulo: {
-      fontWeight: 700,
-      fontSize: 18,
-      marginBottom: 4,
-    },
-    numero: {
-      fontSize: 13,
-      fontWeight: 600,
-      color: "#374151", // gris medio
-      marginBottom: 2,
-    },
-    fecha: {
-      fontSize: 12,
-      color: "#6b7280", // gris más suave
-    },
+    logo: { width: 70, height: 70, objectFit: "contain", marginRight: 8 },
+    textGroup: { color: "#000" },
+    empresaNombre: { fontWeight: 700, fontSize: 14 },
+    empresaDato: { fontSize: 12, lineHeight: 1.3 },
+    right: { textAlign: "right" },
+    title: { fontSize: 18, fontWeight: 700, fontFamily: "Poppins" },
+    number: { fontSize: 13, marginTop: 2 },
+    fechaText: { fontSize: 13 },
   };
 
   return (
     <div style={styles.container}>
-      {/* Empresa */}
-      <div style={styles.left}>{empresa?.nombre || "NOMBRE DE EMPRESA"}</div>
+      <div style={styles.left}>
+        {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
+        <div style={styles.textGroup}>
+          <div style={styles.empresaNombre}>{empresa.nombre}</div>
+          {empresa.ruc && <div style={styles.empresaDato}>{empresa.ruc}</div>}
+          {empresa.direccion && <div style={styles.empresaDato}>{empresa.direccion}</div>}
+          {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
+          {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
+          {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
+        </div>
+      </div>
 
-      {/* Título, número y fecha */}
       <div style={styles.right}>
-        <div style={styles.titulo}>{titulo}</div>
-        {numero && <div style={styles.numero}>N°: {numero}</div>}
-        {fecha && <div style={styles.fecha}>{fecha}</div>}
+        <div style={styles.title}>PROFORMA</div>
+        <div style={styles.number}>N°: {numero}</div>
+        {fecha && <div style={styles.fechaText}>{fecha}</div>}
       </div>
     </div>
   );
