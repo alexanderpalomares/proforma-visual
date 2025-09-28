@@ -31,9 +31,9 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       lineHeight: 1.1,
     },
     empresaNombre: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 14,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     empresaDato: {
       fontSize: 11,
