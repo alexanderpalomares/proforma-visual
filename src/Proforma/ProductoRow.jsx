@@ -37,7 +37,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         },
         name: {
             fontWeight: 800,
-            fontSize: 24,
+            fontSize: 22,
             textTransform: "uppercase",
             marginBottom: 8,
         },
