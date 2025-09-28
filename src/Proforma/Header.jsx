@@ -29,7 +29,7 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.2,
+      lineHeight: 1.1, // 🔑 más compacto
     },
     empresaNombre: {
       fontWeight: 700,
@@ -87,19 +87,19 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
             {empresa?.nombre || "Nombre de la empresa"}
           </div>
           <div style={styles.empresaDato}>
-            RUC: {empresa?.ruc || "---"}
+            {empresa?.ruc || "---"}
           </div>
           <div style={styles.empresaDato}>
             {empresa?.direccion || "Dirección no registrada"}
           </div>
           <div style={styles.empresaDato}>
-            Tel: {empresa?.telefono || "—"}
+            {empresa?.telefono || "—"}
           </div>
           <div style={styles.empresaDato}>
-            Correo: {empresa?.correo || "—"}
+            {empresa?.correo || "—"}
           </div>
           <div style={styles.empresaDato}>
-            Web: {empresa?.web || "—"}
+            {empresa?.web || "—"}
           </div>
         </div>
       </div>
