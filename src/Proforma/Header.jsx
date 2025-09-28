@@ -44,22 +44,26 @@ export default function Header({ empresa, numero, fecha }) {
         },
         // Bloque derecho (Proforma)
         right: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center", // 👈 centra verticalmente
             textAlign: "right",
+            lineHeight: 1.1,          // 👈 compacto, misma proporción que izquierda
         },
+
         proformaTitle: {
-            fontSize: 18,
-            fontWeight: 700,
-            fontFamily: "Poppins, sans-serif",
+            fontSize: 14,             // 👈 mismo tamaño que nombre de empresa
+            fontWeight: 800,
+            marginBottom: 2,
         },
         proformaNumber: {
-            fontSize: 12,
+            fontSize: 11,             // 👈 mismo tamaño que datos
             fontWeight: 600,
-            marginTop: 2,
+            marginBottom: 2,
         },
         proformaFecha: {
-            fontSize: 12,
+            fontSize: 11,             // 👈 mismo tamaño que datos
             color: "#333",
-            marginTop: 2,
         },
     };
 
