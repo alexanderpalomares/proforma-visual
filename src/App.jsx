@@ -5,10 +5,11 @@ import FormularioEmpresa from "./Proforma/FormularioEmpresa";
 import FormularioCliente from "./Proforma/FormularioCliente";
 import FormularioProductosMultiples from "./Proforma/FormularioProductosMultiples";
 import PrevisualizacionProforma from "./Proforma/PrevisualizacionProforma";
+import FormularioTipoDocumento from "./Proforma/FormularioTipoDocumento"; // 👈 nuevo
 import Portada from "./pages/Portada"; // 👈 Importamos la portada
 
 function App() {
-  const [mostrarPortada, setMostrarPortada] = useState(true); // 👈 Nuevo estado
+  const [mostrarPortada, setMostrarPortada] = useState(true); 
   const [empresa, setEmpresa] = useState({
     nombre: "",
     ruc: "",
@@ -28,6 +29,9 @@ function App() {
 
   const [productos, setProductos] = useState([]);
   const [mostrarPrevisualizacion, setMostrarPrevisualizacion] = useState(false);
+
+  // 👇 nuevo estado para tipo de documento
+  const [tipoDocumento, setTipoDocumento] = useState("PROFORMA");
 
   // Funciones
   const abrirPrevisualizacion = () => setMostrarPrevisualizacion(true);
@@ -64,6 +68,14 @@ function App() {
                 </SectionCard>
               </div>
 
+              {/* 👇 nuevo bloque: elegir tipo de documento */}
+              <SectionCard title="Selecciona el tipo de documento" className="col-span-2">
+                <FormularioTipoDocumento 
+                  tipoDocumento={tipoDocumento} 
+                  setTipoDocumento={setTipoDocumento} 
+                />
+              </SectionCard>
+
               <SectionCard title="Ingresa tus productos" className="col-span-2">
                 <FormularioProductosMultiples
                   cliente={cliente}
@@ -78,6 +90,7 @@ function App() {
               empresa={empresa}
               cliente={cliente}
               productos={productos}
+              tipoDocumento={tipoDocumento}   // 👈 pasamos el tipo
               onVolver={cerrarPrevisualizacion}
               onLimpiarCliente={limpiarCliente}
               onLimpiarProductos={limpiarProductos}
