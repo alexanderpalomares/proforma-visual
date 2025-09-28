@@ -29,12 +29,12 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.1, // 🔑 más compacto
+      lineHeight: 1, // 🔑 más compacto
     },
     empresaNombre: {
       fontWeight: 700,
       fontSize: 14,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     empresaDato: {
       fontSize: 11,
