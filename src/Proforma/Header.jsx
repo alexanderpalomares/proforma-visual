@@ -48,18 +48,18 @@ export default function Header({ empresa, numero, fecha }) {
             flexDirection: "column",
             justifyContent: "center", // 👈 centra verticalmente
             textAlign: "right",
-            lineHeight: 1.1,          // 👈 compacto, misma proporción que izquierda
+            lineHeight: 1,          // 👈 compacto, misma proporción que izquierda
         },
 
         proformaTitle: {
             fontSize: 14,             // 👈 mismo tamaño que nombre de empresa
             fontWeight: 800,
-            marginBottom: 2,
+            marginBottom: 1,
         },
         proformaNumber: {
             fontSize: 11,             // 👈 mismo tamaño que datos
             fontWeight: 600,
-            marginBottom: 2,
+            marginBottom: 1,
         },
         proformaFecha: {
             fontSize: 11,             // 👈 mismo tamaño que datos
