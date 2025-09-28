@@ -37,12 +37,12 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1.2,
+      lineHeight: 1,
     },
     empresaNombre: {
       fontWeight: 700,
       fontSize: 14,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     empresaDato: {
       fontSize: 11,
@@ -50,7 +50,7 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
     },
     right: {
       textAlign: "right",
-      lineHeight: 1.2,
+      lineHeight: 1.1,
     },
     docTitle: {
       fontSize: 28,
