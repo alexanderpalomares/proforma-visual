@@ -53,7 +53,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             justifyContent: "flex-end",
             gap: 12,
             marginTop: 8,
-            width: 300,
+            width: 350,
         },
         priceItem: { flex: 1, textAlign: "right" },
         priceLabel: { fontSize: 12, fontWeight: 600, color: "#666" },
