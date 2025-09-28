@@ -46,7 +46,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         desc: {
             fontSize: 12,
             textAlign: "right",
-            maxWidth: 280,   // límite del ancho de la descripción
+            maxWidth: 300,   // límite del ancho de la descripción
             lineHeight: 1.1,
             alignSelf: "flex-end", // mantiene la alineación a la derecha
         },
