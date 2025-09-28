@@ -6,7 +6,7 @@ import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeraci
 
 // Bloques refactorizados (HTML normal, no react-pdf)
 import Header from "./Header";
-// import ClienteInfo from "./ClienteInfo";   // ⬅️ Comentado
+import Header from "./ClienteInfo";
 import ProductoRow from "./ProductoRow";
 // import Totales from "./Totales";          // ⬅️ Comentado
 // import Footer from "./Footer";            // ⬅️ Comentado
