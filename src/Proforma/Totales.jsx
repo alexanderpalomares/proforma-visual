@@ -9,7 +9,7 @@ export default function Totales({ total, formatMoney }) {
       borderTop: "1px solid #E5E5E5",
       textAlign: "right",
     },
-    text: { fontWeight: 700, fontSize: 14, marginTop: 4 },
+    text: { fontWeight: 700, fontSize: 14, marginTop: 2 },
   };
 
   return (
