@@ -41,21 +41,21 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
     },
     right: {
       textAlign: "right",
-      lineHeight: 1.1,
+      lineHeight: 1,
     },
     docTitle: {
-      fontSize: 14,
+      fontSize: 30,
       fontWeight: 800,
-      marginBottom: 2,
+      marginBottom: 1,
       textTransform: "uppercase",
     },
     docNumber: {
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 600,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     docFecha: {
-      fontSize: 11,
+      fontSize: 12,
       color: "#333",
     },
   };
