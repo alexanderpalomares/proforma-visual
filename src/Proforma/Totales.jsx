@@ -4,7 +4,7 @@ import React from "react";
 export default function Totales({ total, formatMoney }) {
   const styles = {
     wrap: {
-      marginTop: 8,
+      marginTop: 2,
       paddingTop: 8,
       borderTop: "1px solid #E5E5E5",
       textAlign: "right",
