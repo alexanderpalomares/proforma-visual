@@ -16,25 +16,33 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       alignItems: "center",
       gap: 12,
     },
-    logo: {
-      height: "100%",
-      maxHeight: 60,
-      aspectRatio: "1/1",
-      objectFit: "contain",
+    logoBox: {
+      width: 60, // 🔑 ancho fijo
+      height: 60, // 🔑 alto fijo
       borderRadius: 10,
       border: "1px solid #E5E5E5",
       background: "#fafafa",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+      flexShrink: 0, // evita que se deforme si el contenedor se hace chico
+    },
+    logo: {
+      width: "100%",
+      height: "100%",
+      objectFit: "contain", // mantiene proporción del logo
     },
     textGroup: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1, // 🔑 más compacto
+      lineHeight: 1.2,
     },
     empresaNombre: {
       fontWeight: 700,
       fontSize: 14,
-      marginBottom: 1,
+      marginBottom: 2,
     },
     empresaDato: {
       fontSize: 11,
@@ -65,42 +73,25 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
     <div style={styles.container}>
       {/* Bloque empresa */}
       <div style={styles.empresaBlock}>
-        {empresa?.logo ? (
-          <img src={empresa.logo} alt="Logo" style={styles.logo} />
-        ) : (
-          <div
-            style={{
-              ...styles.logo,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 10,
-              color: "#999",
-            }}
-          >
-            Logo
-          </div>
-        )}
+        <div style={styles.logoBox}>
+          {empresa?.logo ? (
+            <img src={empresa.logo} alt="Logo" style={styles.logo} />
+          ) : (
+            <span style={{ fontSize: 10, color: "#999" }}>Logo</span>
+          )}
+        </div>
 
         <div style={styles.textGroup}>
           <div style={styles.empresaNombre}>
             {empresa?.nombre || "Nombre de la empresa"}
           </div>
-          <div style={styles.empresaDato}>
-            {empresa?.ruc || "---"}
-          </div>
+          <div style={styles.empresaDato}>{empresa?.ruc || "---"}</div>
           <div style={styles.empresaDato}>
             {empresa?.direccion || "Dirección no registrada"}
           </div>
-          <div style={styles.empresaDato}>
-            {empresa?.telefono || "—"}
-          </div>
-          <div style={styles.empresaDato}>
-            {empresa?.correo || "—"}
-          </div>
-          <div style={styles.empresaDato}>
-            {empresa?.web || "—"}
-          </div>
+          <div style={styles.empresaDato}>{empresa?.telefono || "—"}</div>
+          <div style={styles.empresaDato}>{empresa?.correo || "—"}</div>
+          <div style={styles.empresaDato}>{empresa?.web || "—"}</div>
         </div>
       </div>
 
