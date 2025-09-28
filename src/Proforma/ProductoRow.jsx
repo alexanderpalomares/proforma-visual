@@ -33,7 +33,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             flexDirection: "column",
             alignItems: "flex-end",
             flex: 1,
-            minWidth: 280,
+            minWidth: 300,
         },
         name: {
             fontFamily: "Poppins, sans-serif",
@@ -46,9 +46,8 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         desc: {
             fontSize: 12,
             textAlign: "right",
-            maxWidth: 300,   // límite del ancho de la descripción
-            lineHeight: 1.1,
-            alignSelf: "flex-end", // mantiene la alineación a la derecha
+            width: 280,            // mismo ancho fijo
+            lineHeight: 1.3,
         },
 
         priceBlock: {
@@ -56,8 +55,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             flexDirection: "row",
             justifyContent: "space-between",
             marginTop: 8,
-            width: 300,             // mismo ancho exacto que la descripción
-            alignSelf: "flex-end",
+            width: 280,            // idéntico ancho fijo
         },
 
         priceItem: {
