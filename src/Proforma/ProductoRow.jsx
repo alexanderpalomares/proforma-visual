@@ -50,7 +50,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         },
         priceBlock: {
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             gap: 12,
             marginTop: 8,
             width: 300,
