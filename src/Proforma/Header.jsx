@@ -19,8 +19,8 @@ export default function Header({ empresa, numero, fecha }) {
       gap: 12,
     },
     logo: {
-      width: 60,
-      height: 60,
+      width: 80,
+      height: 80,
       objectFit: "contain",
       borderRadius: 10, // bordes suaves
     },
@@ -35,7 +35,7 @@ export default function Header({ empresa, numero, fecha }) {
     empresaNombre: {
       fontWeight: 700,
       fontSize: 14,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     empresaDato: {
       fontSize: 11,
