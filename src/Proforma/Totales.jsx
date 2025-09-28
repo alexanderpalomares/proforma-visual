@@ -8,58 +8,38 @@ export default function Totales({ total, formatMoney }) {
       paddingTop: 8,
       borderTop: "1px solid #E5E5E5",
       textAlign: "right",
+      lineHeight: 1.2, // 🔹 menos espacio entre líneas
     },
     row: {
-      display: "flex",
-      justifyContent: "flex-end",
-      alignItems: "center",
       fontSize: 14,
+      fontWeight: 500,
+      color: "#333",
+      marginTop: 2, // 🔹 espacio reducido
+    },
+    igv: {
+      fontSize: 14,
+      fontWeight: 400,
+      color: "#666",
       marginTop: 2,
     },
-    label: {
-      fontWeight: 500,
-      marginRight: 6,
-      minWidth: 80, // 🔹 asegura que los ":" queden alineados
-      textAlign: "right",
-    },
-    value: {
-      fontWeight: 500,
-      minWidth: 90, // 🔹 asegura que los "S/" queden alineados
-      textAlign: "left",
-    },
-    totalRow: {
-      display: "flex",
-      justifyContent: "flex-end",
-      alignItems: "center",
+    total: {
       fontSize: 15,
-      marginTop: 4,
       fontWeight: 700,
-    },
-    totalLabel: {
-      marginRight: 6,
-      minWidth: 80,
-      textAlign: "right",
-    },
-    totalValue: {
-      minWidth: 90,
-      textAlign: "left",
-      fontWeight: 700,
+      color: "#111",
+      marginTop: 4, // un poco más para que destaque
     },
   };
 
   return (
     <div style={styles.wrap}>
       <div style={styles.row}>
-        <span style={styles.label}>Subtotal:</span>
-        <span style={styles.value}>S/ {formatMoney(total)}</span>
+        Subtotal: S/ {formatMoney(total)}
       </div>
-      <div style={styles.row}>
-        <span style={styles.label}>IGV (0%):</span>
-        <span style={styles.value}>S/ {formatMoney(0)}</span>
+      <div style={styles.igv}>
+        IGV (0%): S/ {formatMoney(0)}
       </div>
-      <div style={styles.totalRow}>
-        <span style={styles.totalLabel}>Total:</span>
-        <span style={styles.totalValue}>S/ {formatMoney(total)}</span>
+      <div style={styles.total}>
+        Total: S/ {formatMoney(total)}
       </div>
     </div>
   );
