@@ -68,7 +68,16 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
         {empresa?.logo ? (
           <img src={empresa.logo} alt="Logo" style={styles.logo} />
         ) : (
-          <div style={{ ...styles.logo, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#999" }}>
+          <div
+            style={{
+              ...styles.logo,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 10,
+              color: "#999",
+            }}
+          >
             Logo
           </div>
         )}
@@ -90,7 +99,7 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
             Correo: {empresa?.correo || "—"}
           </div>
           <div style={styles.empresaDato}>
-            IG: {empresa?.instagram || "—"}
+            Web: {empresa?.web || "—"}
           </div>
         </div>
       </div>
