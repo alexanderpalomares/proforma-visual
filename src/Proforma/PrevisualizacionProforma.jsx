@@ -5,10 +5,10 @@ import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeraci
 
 // Bloques refactorizados
 import Header from "./components/proforma/Header";
-import ClienteInfo from "./components/proforma/ClienteInfo";
+// import ClienteInfo from "./components/proforma/ClienteInfo"; // ⬅️ Comentado
 import ProductoRow from "./components/proforma/ProductoRow";
-import Totales from "./components/proforma/Totales";
-import Footer from "./components/proforma/Footer";
+// import Totales from "./components/proforma/Totales";        // ⬅️ Comentado
+// import Footer from "./components/proforma/Footer";          // ⬅️ Comentado
 
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
@@ -126,7 +126,8 @@ export default function PrevisualizacionProforma({
 
       <div ref={ref} style={{ ...styles.page, textAlign: "left" }}>
         <Header empresa={empresa} numeroProforma={numeroParaMostrar} fecha={cliente.fecha} />
-        <ClienteInfo cliente={cliente} />
+
+        {/* <ClienteInfo cliente={cliente} /> */} {/* ⬅️ Comentado */}
 
         <div style={styles.productosWrap}>
           {productos.map((p, idx) => (
@@ -134,8 +135,8 @@ export default function PrevisualizacionProforma({
           ))}
         </div>
 
-        <Totales total={total} formatMoney={formatMoney} />
-        <Footer />
+        {/* <Totales total={total} formatMoney={formatMoney} /> */} {/* ⬅️ Comentado */}
+        {/* <Footer /> */} {/* ⬅️ Comentado */}
       </div>
 
       <div
