@@ -45,7 +45,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             fontSize: 12,
             textAlign: "right",
             lineHeight: 1.1,
-            maxWidth: 300, // 👈 limita el ancho de la descripción
+            width: 300, // 👈 limita el ancho de la descripción
             wordWrap: "break-word",
         },
         priceBlock: {
@@ -53,7 +53,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             justifyContent: "flex-end",
             gap: 12,
             marginTop: 8,
-            width: "100%",
+            width: 300,
         },
         priceItem: { minWidth: 100, textAlign: "right" },
         priceLabel: { fontSize: 12, fontWeight: 600, color: "#666" },
