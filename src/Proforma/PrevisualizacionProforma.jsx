@@ -97,6 +97,7 @@ export default function PrevisualizacionProforma({
   empresa = {},
   cliente = {},
   productos = [],
+  tipoDocumento = "PROFORMA", // 👈 nuevo
   onVolver = () => {},
   onLimpiarCliente = () => {},
   onLimpiarProductos = () => {},
@@ -141,13 +142,14 @@ export default function PrevisualizacionProforma({
           cliente={cliente}
           productos={productosReady}
           numeroProforma={numero}
+          tipoDocumento={tipoDocumento} // 👈 pasamos el tipo al PDF
         />
       ).toBlob();
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `PROFORMA_${numero}.pdf`;
+      a.download = `${tipoDocumento}_${numero}.pdf`; // 👈 nombre dinámico
       a.click();
       URL.revokeObjectURL(url);
 
@@ -185,13 +187,18 @@ export default function PrevisualizacionProforma({
 
       {pdfStatus === "success" && (
         <div style={styles.overlaySuccess}>
-          <div style={styles.successBox}>✅ PDF generado con éxito</div>
+          <div style={styles.successBox}>✅ Documento generado con éxito</div>
         </div>
       )}
 
       <div ref={ref} style={styles.page}>
         {/* HEADER */}
-        <Header empresa={empresa} numero={numeroParaMostrar} fecha={cliente.fecha} />
+        <Header
+          empresa={empresa}
+          numero={numeroParaMostrar}
+          fecha={cliente.fecha}
+          tipoDocumento={tipoDocumento} // 👈 nuevo
+        />
 
         {/* CLIENTE */}
         <ClienteInfo cliente={cliente} />
@@ -219,7 +226,7 @@ export default function PrevisualizacionProforma({
         >
           {pdfStatus === "idle" && "Descargar PDF profesional"}
           {pdfStatus === "loading" && "Generando PDF..."}
-          {pdfStatus === "success" && "PDF listo ✅"}
+          {pdfStatus === "success" && "Documento listo ✅"}
           {pdfStatus === "error" && "Error al generar PDF"}
         </button>
 
