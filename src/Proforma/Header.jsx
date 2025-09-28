@@ -52,17 +52,17 @@ export default function Header({ empresa, numero, fecha }) {
         },
 
         proformaTitle: {
-            fontSize: 14,             // 👈 mismo tamaño que nombre de empresa
+            fontSize: 20,             // 👈 mismo tamaño que nombre de empresa
             fontWeight: 800,
             marginBottom: 1,
         },
         proformaNumber: {
-            fontSize: 11,             // 👈 mismo tamaño que datos
+            fontSize: 12,             // 👈 mismo tamaño que datos
             fontWeight: 600,
             marginBottom: 1,
         },
         proformaFecha: {
-            fontSize: 11,             // 👈 mismo tamaño que datos
+            fontSize: 12,             // 👈 mismo tamaño que datos
             color: "#333",
         },
     };
