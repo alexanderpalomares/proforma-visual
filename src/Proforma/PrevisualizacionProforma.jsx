@@ -3,34 +3,20 @@ import { pdf } from "@react-pdf/renderer";
 import ProformaPDF from "../pdf/ProformaPDF";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
+// Bloques
+import Header from "./components/proforma/Header";
+import ClienteInfo from "./components/proforma/ClienteInfo";
+import ProductoRow from "./components/proforma/ProductoRow";
+import Totales from "./components/proforma/Totales";
+import Footer from "./components/proforma/Footer";
+
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ─────────────────── Función para convertir cualquier imagen a PNG ───────────────────
-const convertToPngBase64 = (fileOrUrl) =>
-  new Promise((resolve, reject) => {
-    try {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png")); // convierte todo a PNG
-      };
-      img.onerror = (err) => reject(err);
-      img.src = fileOrUrl;
-    } catch (e) {
-      reject(e);
-    }
-  });
-
-// ─────────────────── Estilos ESPEJO del PDF (ProformaPDF.jsx) ───────────────────
+// ─────────────────── Estilos globales ───────────────────
 const styles = {
   page: {
     width: 794,
@@ -40,137 +26,7 @@ const styles = {
     fontFamily: "Helvetica",
     color: "#000",
   },
-  headerContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottom: "1px solid #D9D9D9",
-  },
-  headerLeft: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  logo: { width: 87, height: 87, marginRight: 5 },
-  headerTextGroup: { color: "#000" },
-  empresaNombre: { fontWeight: 700, fontSize: 12.5 },
-  empresaDato: { fontSize: 12.5, lineHeight: 1.2 },
-  proformaBlock: { textAlign: "right" },
-  proformaTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    fontFamily: "Poppins",
-  },
-  proformaNumber: { fontSize: 13, marginTop: 2 },
-  proformaFecha: { fontSize: 13, color: "#000" },
-  clienteSection: {
-    paddingTop: 6,
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottom: "1px solid #E5E5E5",
-    lineHeight: 1.2,
-  },
-  clienteLabel: { fontWeight: 700, fontSize: 12.5, marginBottom: 2 },
-  clienteItem: { fontSize: 12.5, margin: "1px 0" },
   productosWrap: { display: "flex", flexDirection: "column" },
-  productoRow: {
-    display: "flex",
-    flexDirection: "row",
-    gap: 12,
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  productoSeparator: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTop: "1px solid #EDEDED",
-  },
-  productoImgLeft: {
-    width: 350,
-    height: 300,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    flexShrink: 0,
-  },
-  productoImgTag: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-  },
-  productoDetails: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    flex: "1 1 0",
-    minWidth: 320,
-    maxWidth: 320,
-    marginLeft: "auto",
-  },
-  productoName: {
-    fontFamily: "Poppins, sans-serif",
-    fontWeight: 700,
-    fontSize: 17,
-    textTransform: "uppercase",
-    textAlign: "right",
-    marginBottom: 10,
-  },
-  productoDesc: {
-    fontSize: 13,
-    textAlign: "right",
-    maxWidth: "100%",
-    alignSelf: "flex-end",
-    lineHeight: 1.2,
-  },
-  grow: { flexGrow: 1 },
-  priceBlock: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 12,
-    marginTop: 8,
-    width: "100%",
-    flexWrap: "nowrap",
-  },
-  priceItem: {
-    minWidth: 120,
-    textAlign: "right",
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: "#666",
-    fontWeight: 700,
-  },
-  priceValue: {
-    fontSize: 14,
-    fontWeight: 700,
-  },
-  totalWrap: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTop: "1px solid #E5E5E5",
-  },
-  totalText: {
-    textAlign: "right",
-    fontWeight: 700,
-    fontSize: 15,
-    marginTop: 4,
-    lineHeight: 1.2,
-  },
-  footer: {
-    marginTop: 12,
-    paddingTop: 10,
-    fontSize: 9,
-    color: "#555",
-    lineHeight: 1.3,
-    textAlign: "justify",
-    borderTop: "2px solid #D0D0D0",
-  },
   actions: {
     display: "flex",
     justifyContent: "end",
@@ -190,29 +46,6 @@ const styles = {
   btnBlue: { backgroundColor: "#2563eb" },
   btnRed: { backgroundColor: "#dc2626" },
   btnGray: { backgroundColor: "#6b7280" },
-  overlaySuccess: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 9999,
-  },
-  successBox: {
-    backgroundColor: "#fff",
-    padding: "24px 32px",
-    borderRadius: 12,
-    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#16a34a",
-    fontFamily: "Poppins, sans-serif",
-  },
 };
 
 export default function PrevisualizacionProforma({
@@ -243,26 +76,11 @@ export default function PrevisualizacionProforma({
       const numero = getNextProformaNumber();
       setNumeroFinal(numero);
 
-      const productosReady = await Promise.all(
-        productos.map(async (p) => {
-          if (p.imagenForPdf) return p;
-          const src = p.imagenFile || p.imagenPreview || p.imagen;
-          if (!src) return p;
-          try {
-            const imagenForPdf = await convertToPngBase64(src);
-            return { ...p, imagenForPdf };
-          } catch (err) {
-            console.error("Error al convertir imagen:", err);
-            return p; // fallback si falla la conversión
-          }
-        })
-      );
-
       const blob = await pdf(
         <ProformaPDF
           empresa={empresa}
           cliente={cliente}
-          productos={productosReady}
+          productos={productos}
           numeroProforma={numero}
         />
       ).toBlob();
@@ -307,96 +125,18 @@ export default function PrevisualizacionProforma({
         rel="stylesheet"
       />
 
-      {pdfStatus === "success" && (
-        <div style={styles.overlaySuccess}>
-          <div style={styles.successBox}>✅ PDF generado con éxito</div>
-        </div>
-      )}
-
       <div ref={ref} style={{ ...styles.page, textAlign: "left" }}>
-        <div style={styles.headerContainer}>
-          <div style={styles.headerLeft}>
-            {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
-            <div style={styles.headerTextGroup}>
-              <div style={styles.empresaNombre}>{empresa.nombre}</div>
-              <div style={styles.empresaDato}>{empresa.ruc}</div>
-              <div style={styles.empresaDato}>{empresa.direccion}</div>
-              {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
-              {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
-              {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
-            </div>
-          </div>
-
-          <div style={styles.proformaBlock}>
-            <div style={styles.proformaTitle}>PROFORMA</div>
-            <div style={styles.proformaNumber}>N°: {numeroParaMostrar}</div>
-            {cliente.fecha && <div style={styles.proformaFecha}>Fecha: {cliente.fecha}</div>}
-          </div>
-        </div>
-
-        <div style={styles.clienteSection}>
-          <div style={styles.clienteLabel}>Cliente</div>
-          {cliente.nombre && <div style={styles.clienteItem}>Nombre: {cliente.nombre}</div>}
-          {cliente.ruc && <div style={styles.clienteItem}>RUC: {cliente.ruc}</div>}
-          {cliente.direccion && <div style={styles.clienteItem}>Dirección: {cliente.direccion}</div>}
-        </div>
+        <Header empresa={empresa} numeroProforma={numeroParaMostrar} fecha={cliente.fecha} />
+        <ClienteInfo cliente={cliente} />
 
         <div style={styles.productosWrap}>
-          {productos.map((p, idx) => {
-            const precio = Number(p.precio) || 0;
-            const cantidad = Number(p.cantidad) || 0;
-            const importe = precio * cantidad;
-            const tieneImagen = p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen;
-
-            return (
-              <div
-                key={idx}
-                style={{
-                  ...styles.productoRow,
-                  ...(idx > 0 ? styles.productoSeparator : {}),
-                }}
-              >
-                <div style={styles.productoImgLeft}>
-                  {tieneImagen && (
-                    <img
-                      src={p.imagenForPdf || p.imagenPreview || p.imagenFile || p.imagen}
-                      alt={p.nombre || "Producto"}
-                      style={styles.productoImgTag}
-                    />
-                  )}
-                </div>
-
-                <div style={styles.productoDetails}>
-                  <div style={styles.productoName}>{p.nombre}</div>
-                  {p.descripcion && <div style={styles.productoDesc}>{p.descripcion}</div>}
-
-                  <div style={styles.grow} />
-
-                  <div style={styles.priceBlock}>
-                    <div style={styles.priceItem}>
-                      <div style={styles.priceLabel}>Precio</div>
-                      <div style={styles.priceValue}>S/ {formatMoney(precio)}</div>
-                    </div>
-                    <div style={styles.priceItem}>
-                      <div style={styles.priceLabel}>Cantidad</div>
-                      <div style={styles.priceValue}>{cantidad}</div>
-                    </div>
-                    <div style={styles.priceItem}>
-                      <div style={styles.priceLabel}>Importe</div>
-                      <div style={styles.priceValue}>S/ {formatMoney(importe)}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {productos.map((p, idx) => (
+            <ProductoRow key={idx} producto={p} idx={idx} formatMoney={formatMoney} />
+          ))}
         </div>
 
-        <div style={styles.totalWrap}>
-          <div style={styles.totalText}>Subtotal: S/ {formatMoney(total)}</div>
-          <div style={styles.totalText}>IGV (0%): S/ {formatMoney(0)}</div>
-          <div style={styles.totalText}>Total: S/ {formatMoney(total)}</div>
-        </div>
+        <Totales total={total} formatMoney={formatMoney} />
+        <Footer />
       </div>
 
       <div
