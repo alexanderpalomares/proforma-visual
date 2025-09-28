@@ -7,7 +7,7 @@ export default function Header({ empresa, titulo = "PROFORMA", numero, fecha }) 
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      backgroundColor: "#2563eb", // azul corporativo
+      backgroundColor: "#F3F4F6", // azul corporativo
       color: "#fff",
       padding: "16px 24px",
       borderRadius: 4,
