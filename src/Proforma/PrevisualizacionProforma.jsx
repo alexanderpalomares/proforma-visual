@@ -1,14 +1,15 @@
+// src/Proforma/PrevisualizacionProforma.jsx
 import React, { useMemo, useRef, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
-import ProformaPDF from "../pdf/ProformaPDF";
+import ProformaPDF from "../pdf/ProformaPDF"; 
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// Bloques refactorizados
-import Header from "./components/proforma/Header";
-// import ClienteInfo from "./components/proforma/ClienteInfo"; // ⬅️ Comentado
-import ProductoRow from "./components/proforma/ProductoRow";
-// import Totales from "./components/proforma/Totales";        // ⬅️ Comentado
-// import Footer from "./components/proforma/Footer";          // ⬅️ Comentado
+// Bloques refactorizados (HTML normal, no react-pdf)
+import Header from "./Header";
+import ClienteInfo from "./ClienteInfo";
+import ProductoRow from "./ProductoRow";
+import Totales from "./Totales";
+import Footer from "./Footer";
 
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
@@ -28,8 +29,9 @@ const styles = {
   productosWrap: { display: "flex", flexDirection: "column" },
   actions: {
     display: "flex",
-    justifyContent: "end",
+    justifyContent: "center",
     gap: 8,
+    marginTop: 16,
     marginBottom: 16,
   },
   btn: {
@@ -75,6 +77,7 @@ export default function PrevisualizacionProforma({
       const numero = getNextProformaNumber();
       setNumeroFinal(numero);
 
+      // 🔥 OJO: aquí sí usamos ProformaPDF, pero NO se monta en la pantalla
       const blob = await pdf(
         <ProformaPDF
           empresa={empresa}
@@ -124,10 +127,9 @@ export default function PrevisualizacionProforma({
         rel="stylesheet"
       />
 
-      <div ref={ref} style={{ ...styles.page, textAlign: "left" }}>
+      <div ref={ref} style={styles.page}>
         <Header empresa={empresa} numeroProforma={numeroParaMostrar} fecha={cliente.fecha} />
-
-        {/* <ClienteInfo cliente={cliente} /> */} {/* ⬅️ Comentado */}
+        <ClienteInfo cliente={cliente} />
 
         <div style={styles.productosWrap}>
           {productos.map((p, idx) => (
@@ -135,14 +137,12 @@ export default function PrevisualizacionProforma({
           ))}
         </div>
 
-        {/* <Totales total={total} formatMoney={formatMoney} /> */} {/* ⬅️ Comentado */}
-        {/* <Footer /> */} {/* ⬅️ Comentado */}
+        <Totales total={total} formatMoney={formatMoney} />
+        <Footer />
       </div>
 
-      <div
-        className="print:hidden"
-        style={{ ...styles.actions, justifyContent: "center", marginTop: 16 }}
-      >
+      {/* Botones de acción */}
+      <div className="print:hidden" style={styles.actions}>
         <button
           type="button"
           onClick={handleExportPdfPro}
