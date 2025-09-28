@@ -1,45 +1,90 @@
-// src/App.jsx
+// App.jsx
 import React, { useState } from "react";
+import SectionCard from "./Proforma/SectionCard";
+import FormularioEmpresa from "./Proforma/FormularioEmpresa";
+import FormularioCliente from "./Proforma/FormularioCliente";
+import FormularioProductosMultiples from "./Proforma/FormularioProductosMultiples";
 import PrevisualizacionProforma from "./Proforma/PrevisualizacionProforma";
+import Portada from "./pages/Portada"; // 👈 Importamos la portada
 
 function App() {
-  const [empresa] = useState({
-    nombre: "Bicicentro Carlitos",
-    ruc: "20601648351",
-    direccion: "Jr. Máximo Gorbitz 892",
-    telefono: "987916570",
-    correo: "alepalomaresangel@gmail.com",
-    web: "www.bicicentrocarlitos.pe",
-    logo: "/favicon.png",
+  const [mostrarPortada, setMostrarPortada] = useState(true); // 👈 Nuevo estado
+  const [empresa, setEmpresa] = useState({
+    nombre: "",
+    ruc: "",
+    direccion: "",
+    telefono: "",
+    correo: "",
+    instagram: "",
+    logo: ""
   });
 
-  const [cliente] = useState({
-    nombre: "Alexander Palomares",
-    ruc: "20612781843",
-    direccion: "Jr. Máximo Gorbitz 892",
-    fecha: "2025-09-17",
+  const [cliente, setCliente] = useState({
+    nombre: "",
+    ruc: "",
+    direccion: "",
+    fecha: ""
   });
 
-  const [productos] = useState([
-    {
-      nombre: "Bicicleta GROW UP 29",
-      descripcion: "Con la BURNER 29'' le resultará más fácil controlar la bicicleta...",
-      precio: 30,
-      cantidad: 2,
-      imagenPreview: "/bicicleta.png",
-    },
-  ]);
+  const [productos, setProductos] = useState([]);
+  const [mostrarPrevisualizacion, setMostrarPrevisualizacion] = useState(false);
+
+  // Funciones
+  const abrirPrevisualizacion = () => setMostrarPrevisualizacion(true);
+  const cerrarPrevisualizacion = () => setMostrarPrevisualizacion(false);
+
+  const limpiarCliente = () => {
+    setCliente({
+      nombre: "",
+      ruc: "",
+      direccion: "",
+      fecha: ""
+    });
+  };
+
+  const limpiarProductos = () => {
+    setProductos([]);
+  };
 
   return (
-    <div>
-      <PrevisualizacionProforma
-        empresa={empresa}
-        cliente={cliente}
-        productos={productos}
-        onVolver={() => console.log("Volver presionado")}
-        onLimpiarCliente={() => console.log("Cliente limpiado")}
-        onLimpiarProductos={() => console.log("Productos limpiados")}
-      />
+    <div className="min-h-screen bg-gray-50">
+      {mostrarPortada ? (
+        <Portada onComenzar={() => setMostrarPortada(false)} />
+      ) : (
+        <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+          {!mostrarPrevisualizacion ? (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SectionCard title="Ingresa los datos de tu empresa" className="h-full">
+                  <FormularioEmpresa empresa={empresa} setEmpresa={setEmpresa} />
+                </SectionCard>
+
+                <SectionCard title="Ingresa los datos de tu cliente" className="h-full">
+                  <FormularioCliente cliente={cliente} setCliente={setCliente} />
+                </SectionCard>
+              </div>
+
+              <SectionCard title="Ingresa tus productos" className="col-span-2">
+                <FormularioProductosMultiples
+                  cliente={cliente}
+                  productos={productos}
+                  setProductos={setProductos}
+                  manejarMostrarPrevisualizacion={abrirPrevisualizacion}
+                />
+              </SectionCard>
+            </>
+          ) : (
+            <PrevisualizacionProforma
+              empresa={empresa}
+              cliente={cliente}
+              productos={productos}
+              onVolver={cerrarPrevisualizacion}
+              onLimpiarCliente={limpiarCliente}
+              onLimpiarProductos={limpiarProductos}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
