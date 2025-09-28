@@ -3,7 +3,7 @@ import { pdf } from "@react-pdf/renderer";
 import ProformaPDF from "../pdf/ProformaPDF";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// Bloques
+// Bloques refactorizados
 import Header from "./components/proforma/Header";
 import ClienteInfo from "./components/proforma/ClienteInfo";
 import ProductoRow from "./components/proforma/ProductoRow";
@@ -16,7 +16,6 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ─────────────────── Estilos globales ───────────────────
 const styles = {
   page: {
     width: 794,
