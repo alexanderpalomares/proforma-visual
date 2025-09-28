@@ -38,7 +38,7 @@ export default function Header({ empresa, numero, fecha }) {
       marginBottom: 1,
     },
     empresaDato: {
-      fontSize: 11,
+      fontSize: 12,
       color: "#333",
     },
     // Bloque derecho (proforma)
