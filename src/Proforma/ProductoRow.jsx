@@ -35,6 +35,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
         contentWrap: {
             display: "flex",
             flexDirection: "row",
+            justifyContent: "space-between", // mantiene izquierda y derecha
             flex: 1,
             gap: 16,
         },
