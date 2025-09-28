@@ -55,7 +55,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             marginTop: 8,
             width: 300,
         },
-        priceItem: { minWidth: 100, textAlign: "right" },
+        priceItem: { flex: 1, textAlign: "right" },
         priceLabel: { fontSize: 12, fontWeight: 600, color: "#666" },
         priceValue: { fontSize: 13, fontWeight: 700 },
     };
