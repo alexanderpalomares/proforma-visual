@@ -6,45 +6,47 @@ export default function Header({ empresa, numero, fecha }) {
     container: {
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "center",
+      alignItems: "flex-start",
       paddingBottom: 10,
       marginBottom: 10,
-      borderBottom: "1px solid #D9D9D9",
+      borderBottom: "1px solid #E5E5E5",
     },
     left: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
+      fontWeight: 700,
+      fontSize: 18,
+      textTransform: "uppercase",
+      color: "#000",
     },
-    logo: { width: 70, height: 70, objectFit: "contain", marginRight: 8 },
-    textGroup: { color: "#000" },
-    empresaNombre: { fontWeight: 700, fontSize: 14 },
-    empresaDato: { fontSize: 12, lineHeight: 1.3 },
-    right: { textAlign: "right" },
-    title: { fontSize: 18, fontWeight: 700, fontFamily: "Poppins" },
-    number: { fontSize: 13, marginTop: 2 },
-    fecha: { fontSize: 13 },
+    right: {
+      textAlign: "right",
+    },
+    proformaTitle: {
+      fontSize: 16,
+      fontWeight: 700,
+      fontFamily: "Poppins, sans-serif",
+    },
+    proformaNumber: {
+      fontSize: 12,
+      fontWeight: 600,
+      marginTop: 2,
+    },
+    proformaFecha: {
+      fontSize: 12,
+      color: "#333",
+      marginTop: 2,
+    },
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.left}>
-        {empresa.logo && <img src={empresa.logo} alt="Logo" style={styles.logo} />}
-        <div style={styles.textGroup}>
-          <div style={styles.empresaNombre}>{empresa.nombre}</div>
-          {empresa.ruc && <div style={styles.empresaDato}>{empresa.ruc}</div>}
-          {empresa.direccion && <div style={styles.empresaDato}>{empresa.direccion}</div>}
-          {empresa.telefono && <div style={styles.empresaDato}>Tel: {empresa.telefono}</div>}
-          {empresa.correo && <div style={styles.empresaDato}>{empresa.correo}</div>}
-          {empresa.web && <div style={styles.empresaDato}>{empresa.web}</div>}
-        </div>
-      </div>
+      {/* Nombre de la empresa emisora */}
+      <div style={styles.left}>{empresa?.nombre || "NOMBRE DE EMPRESA"}</div>
 
+      {/* Bloque de Proforma */}
       <div style={styles.right}>
-        <div style={styles.title}>PROFORMA</div>
-        <div style={styles.number}>N°: {numero}</div>
-        {fecha && <div style={styles.fecha}>Fecha: {fecha}</div>}
+        <div style={styles.proformaTitle}>PROFORMA</div>
+        {numero && <div style={styles.proformaNumber}>N°: {numero}</div>}
+        {fecha && <div style={styles.proformaFecha}>{fecha}</div>}
       </div>
     </div>
   );
