@@ -1,16 +1,13 @@
-// src/pdf/ProformaPDF.jsx
 import React from "react";
-import {
-  Page,
-  Text,
-  View,
-  Document,
-  Image,
-  StyleSheet,
-  Font,
-} from "@react-pdf/renderer";
+import { Page, Document, StyleSheet, Font } from "@react-pdf/renderer";
 
-// Registrar Poppins (para PROFORMA y nombre del producto)
+import HeaderPDF from "./HeaderPDF";
+import ClientePDF from "./ClientePDF";
+import ProductoRowPDF from "./ProductoRowPDF";
+import TotalesPDF from "./TotalesPDF";
+import FooterPDF from "./FooterPDF";
+
+// Registrar Poppins
 Font.register({
   family: "Poppins",
   fonts: [
@@ -25,12 +22,6 @@ Font.register({
   ],
 });
 
-const PEN = new Intl.NumberFormat("es-PE", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-const formatMoney = (n) => PEN.format(Number(n) || 0);
-
 const styles = StyleSheet.create({
   page: {
     padding: 24,
@@ -38,215 +29,19 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     backgroundColor: "#ffffff",
   },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderColor: "#D9D9D9",
-  },
-
-  logo: {
-    height: 70,         // controla la altura máxima
-    width: "auto",      // mantiene proporción del logo
-    marginRight: 12,
-    borderRadius: 10,   // esquinas redondeadas
-    alignSelf: "center" // asegura que quede alineado con el texto
-  },
-
-
-  headerTextGroup: {
-    justifyContent: "center", // centra verticalmente el texto
-    color: "#000"
-  },
-
-
-  empresaNombre: { fontWeight: "bold" },
-  proformaBlock: { textAlign: "right" },
-  proformaTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    fontFamily: "Poppins",
-  },
-  proformaNumber: { fontSize: 11, marginTop: 2 },
-  clienteSection: {
-    paddingTop: 6,
-    paddingBottom: 10,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderColor: "#E5E5E5",
-  },
-  clienteLabel: { fontWeight: "bold" },
-  productoRow: {
-    flexDirection: "row",
-    gap: 12,
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  productoSeparator: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderColor: "#EDEDED",
-  },
-  productoImgLeft: {
-    width: 250,
-    height: 200,
-    objectFit: "contain",
-    alignSelf: "center",
-  },
-  productoDetails: {
-    flexDirection: "column",
-    alignItems: "flex-end",
-    width: 280,
-  },
-  productoName: {
-    fontFamily: "Poppins",
-    fontWeight: "bold",
-    fontSize: 13,
-    textTransform: "uppercase",
-    marginBottom: 4,
-    textAlign: "right",
-  },
-  productoDesc: {
-    fontSize: 10,
-    textAlign: "right",
-    maxWidth: 240,
-    alignSelf: "flex-end",
-  },
-  priceBlock: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 12,
-    marginTop: 8,
-  },
-  priceItem: { minWidth: 90, alignItems: "flex-end" },
-  priceLabel: { fontSize: 9, color: "#666" },
-  priceValue: { fontSize: 11, fontWeight: "bold" },
-  totalWrap: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderColor: "#E5E5E5",
-  },
-  totalText: {
-    textAlign: "right",
-    fontWeight: "bold",
-    fontSize: 12,
-    marginTop: 4,
-  },
-  pageNumber: {
-    position: "absolute",
-    bottom: 10,
-    right: 24,
-    fontSize: 8,
-    color: "#666",
-  },
 });
 
-const ProformaPDF = ({ empresa, cliente, productos, numeroProforma }) => {
-  const total = productos.reduce(
-    (acc, p) => acc + ((+p.precio || 0) * (+p.cantidad || 0)),
-    0
-  );
-  const subtotal = total;
-  const igv = 0.0;
-
+const ProformaPDF = ({ empresa, cliente, productos, numeroProforma, observaciones, banco }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Encabezado */}
-        <View style={styles.headerContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            {empresa.logo && <Image src={empresa.logo} style={styles.logo} />}
-            <View style={styles.headerTextGroup}>
-              <Text style={styles.empresaNombre}>{empresa.nombre}</Text>
-              {empresa.ruc && <Text>{empresa.ruc}</Text>}
-              {empresa.direccion && <Text>{empresa.direccion}</Text>}
-              {empresa.telefono && <Text>Tel: {empresa.telefono}</Text>}
-              {empresa.correo && <Text>{empresa.correo}</Text>}
-              {empresa.web && <Text>{empresa.web}</Text>}
-            </View>
-          </View>
-          <View style={styles.proformaBlock}>
-            <Text style={styles.proformaTitle}>PROFORMA</Text>
-            {numeroProforma && (
-              <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>
-            )}
-            {cliente.fecha && <Text>Fecha: {cliente.fecha}</Text>}
-          </View>
-        </View>
-
-        {/* Cliente */}
-        <View style={styles.clienteSection}>
-          <Text style={styles.clienteLabel}>Cliente</Text>
-          {cliente.nombre && <Text>Nombre: {cliente.nombre}</Text>}
-          {cliente.ruc && <Text>RUC: {cliente.ruc}</Text>}
-          {cliente.direccion && <Text>Dirección: {cliente.direccion}</Text>}
-        </View>
-
-        {/* Productos */}
-        {productos.map((p, idx) => {
-          const precio = Number(p.precio) || 0;
-          const cantidad = Number(p.cantidad) || 0;
-          const importe = precio * cantidad;
-
-          return (
-            <View
-              key={idx}
-              style={[styles.productoRow, idx > 0 && styles.productoSeparator]}
-            >
-              {p.imagenForPdf && (
-                <Image src={p.imagenForPdf} style={styles.productoImgLeft} />
-              )}
-              <View style={styles.productoDetails}>
-                <Text style={styles.productoName}>{p.nombre}</Text>
-                {p.descripcion && (
-                  <Text style={styles.productoDesc}>{p.descripcion}</Text>
-                )}
-                <View style={{ flexGrow: 1 }} />
-                <View style={styles.priceBlock}>
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Precio</Text>
-                    <Text style={styles.priceValue}>
-                      S/ {formatMoney(precio)}
-                    </Text>
-                  </View>
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Cantidad</Text>
-                    <Text style={styles.priceValue}>{cantidad}</Text>
-                  </View>
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Importe</Text>
-                    <Text style={styles.priceValue}>
-                      S/ {formatMoney(importe)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          );
-        })}
-
-        {/* Total con desglose */}
-        <View style={styles.totalWrap}>
-          <Text style={styles.totalText}>
-            Subtotal: S/ {formatMoney(subtotal)}
-          </Text>
-          <Text style={styles.totalText}>IGV (0%): S/ {formatMoney(igv)}</Text>
-          <Text style={styles.totalText}>Total: S/ {formatMoney(total)}</Text>
-        </View>
-
-        {/* Nº de página */}
-        <Text
-          style={styles.pageNumber}
-          render={({ pageNumber, totalPages }) =>
-            `${pageNumber} / ${totalPages}`
-          }
-          fixed
-        />
+        <HeaderPDF empresa={empresa} numeroProforma={numeroProforma} fecha={cliente.fecha} />
+        <ClientePDF cliente={cliente} />
+        {productos.map((p, idx) => (
+          <ProductoRowPDF key={idx} producto={p} idx={idx} />
+        ))}
+        <TotalesPDF productos={productos} />
+        <FooterPDF observaciones={observaciones} banco={banco} empresa={empresa} />
       </Page>
     </Document>
   );
