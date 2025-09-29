@@ -22,8 +22,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#E5E5E5",
-    backgroundColor: "#fafafa",
     marginRight: 8,
     overflow: "hidden",
   },
@@ -35,7 +33,7 @@ const styles = StyleSheet.create({
   headerTextGroup: {
     flexDirection: "column",
     justifyContent: "center",
-    lineHeight: 1.1,
+    lineHeight: 1,
   },
   empresaNombre: {
     fontFamily: "Poppins",
@@ -47,7 +45,7 @@ const styles = StyleSheet.create({
   empresaDato: {
     fontSize: 9,      // más pequeño
     color: "#333",
-    lineHeight: 1.1,  // menos espacio entre líneas
+    lineHeight: 1,  // menos espacio entre líneas
   },
 
   // Bloque documento
