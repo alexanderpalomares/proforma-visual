@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.1,
   },
   docFecha: {
-    fontSize: 10,
+    fontSize: 20,
     color: "#333",
     lineHeight: 1.1,
   },
