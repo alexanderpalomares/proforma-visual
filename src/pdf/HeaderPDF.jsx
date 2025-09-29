@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
 
     docTitle: {
-        fontFamily: "Poppins",
+        fontFamily: "Helvetica",
         fontSize: 40,      // 👈 bien grande
         fontWeight: "bold",
         marginBottom: 2,
