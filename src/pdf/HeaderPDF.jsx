@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",   // 👈 no lo centres verticalmente
+    alignItems: "center",
     paddingBottom: 8,
     marginBottom: 10,
     borderBottomWidth: 1,
@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoBox: {
-    width: 30,
-    height: 30,
+    width: 70,
+    height: 70,
     borderRadius: 10,
     overflow: "hidden",
     marginRight: 10,
@@ -49,27 +49,21 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "flex-end",
     textAlign: "right",
-    justifyContent: "flex-start",
-    minHeight: 80,   // 👈 espacio suficiente para título grande
   },
-
   docTitle: {
-    fontFamily: "Helvetica-Bold", // 👈 usa Helvetica en negrita
-    fontSize: 15,                 // 👈 ahora crecerá de verdad
-    marginBottom: 4,
-    lineHeight: 1.1,               // 👈 relativo, no absoluto
+    fontFamily: "Helvetica-Bold",
+    fontSize: 28,
+    marginBottom: 2,
     textTransform: "uppercase",
   },
   docNumber: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: "Helvetica-Bold",
     marginBottom: 2,
-    lineHeight: 1.1,
   },
   docFecha: {
-    fontSize: 20,
+    fontSize: 11,
     color: "#333",
-    lineHeight: 1.1,
   },
 });
 
