@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
 
   docTitle: {
   fontFamily: "Poppins",
-  fontSize: 20,
+  fontSize: 24,
   fontWeight: "bold",
   marginBottom: 1,   // 👈 sin margen extra
   lineHeight: 1,   // 👈 más compacto
