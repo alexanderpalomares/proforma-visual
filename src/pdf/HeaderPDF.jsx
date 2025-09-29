@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     fontSize: 20,      // tamaño más equilibrado
     fontWeight: "bold",
-    marginBottom: 2,
+    marginBottom: 1,
     textTransform: "uppercase",
   },
   docNumber: {
     fontSize: 11,
     fontWeight: "bold",
-    marginBottom: 2,
+    marginBottom: 1,
   },
   docFecha: {
     fontSize: 10,
