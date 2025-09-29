@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoBox: {
-    width: 70,
-    height: 70,
+    width: 90,
+    height: 90,
     borderRadius: 10,
     overflow: "hidden",
     marginRight: 10,
