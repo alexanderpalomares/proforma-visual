@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 export default function ClientePDF({ cliente }) {
   return (
     <View style={styles.section}>
-      <Text style={styles.label}>Cliente</Text>
+      <Text style={styles.label}></Text>
       {cliente.nombre && <Text>{cliente.nombre}</Text>}
       {cliente.ruc && <Text>{cliente.ruc}</Text>}
       {cliente.direccion && <Text>{cliente.direccion}</Text>}
