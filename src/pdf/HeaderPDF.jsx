@@ -6,44 +6,75 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingBottom: 10,
+    paddingBottom: 8,
     marginBottom: 10,
     borderBottomWidth: 1,
     borderColor: "#D9D9D9",
   },
+
+  // Bloque empresa
   empresaBlock: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
   },
   logoBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+    width: 40,        // más compacto que antes
+    height: 40,
+    borderRadius: 6,
     borderWidth: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: "#E5E5E5",
+    backgroundColor: "#fafafa",
     marginRight: 8,
+    overflow: "hidden",
   },
-  logo: { width: "100%", height: "100%", objectFit: "contain" },
-  headerTextGroup: { flexDirection: "column", justifyContent: "center", lineHeight: 1 },
-  empresaNombre: { fontFamily: "Poppins", fontSize: 12, fontWeight: "bold" },
-  empresaDato: { fontSize: 10, color: "#333" },
-  proformaBlock: { textAlign: "right" },
-  proformaTitle: { fontSize: 14, fontWeight: "bold", fontFamily: "Poppins" },
-  proformaNumber: { fontSize: 11, marginTop: 2 },
+  logo: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  },
+  headerTextGroup: {
+    flexDirection: "column",
+    justifyContent: "center",
+    lineHeight: 1.1,
+  },
+  empresaNombre: {
+    fontFamily: "Poppins",
+    fontSize: 11,     // ajustado
+    fontWeight: "bold",
+    marginBottom: 2,
+    lineHeight: 1.1,
+  },
+  empresaDato: {
+    fontSize: 9,      // más pequeño
+    color: "#333",
+    lineHeight: 1.1,  // menos espacio entre líneas
+  },
+
+  // Bloque documento
+  proformaBlock: {
+    textAlign: "right",
+  },
+  proformaTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    fontFamily: "Poppins",
+  },
+  proformaNumber: {
+    fontSize: 10,
+    marginTop: 2,
+  },
 });
 
 export default function HeaderPDF({ empresa, numeroProforma, fecha }) {
   return (
     <View style={styles.container}>
+      {/* Bloque empresa */}
       <View style={styles.empresaBlock}>
         <View style={styles.logoBox}>
           {empresa.logo ? (
             <Image src={empresa.logo} style={styles.logo} />
           ) : (
-            <Text style={{ fontSize: 8, color: "#999" }}>Logo</Text>
+            <Text style={{ fontSize: 7, color: "#999" }}>Logo</Text>
           )}
         </View>
         <View style={styles.headerTextGroup}>
@@ -55,10 +86,12 @@ export default function HeaderPDF({ empresa, numeroProforma, fecha }) {
           {empresa.web && <Text style={styles.empresaDato}>{empresa.web}</Text>}
         </View>
       </View>
+
+      {/* Bloque documento */}
       <View style={styles.proformaBlock}>
         <Text style={styles.proformaTitle}>PROFORMA</Text>
         {numeroProforma && <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>}
-        {fecha && <Text>{fecha}</Text>}
+        {fecha && <Text style={{ fontSize: 9 }}>{fecha}</Text>}
       </View>
     </View>
   );
