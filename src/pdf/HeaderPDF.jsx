@@ -53,22 +53,27 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     textAlign: "right",
   },
+
   docTitle: {
-    fontFamily: "Poppins",
-    fontSize: 20,      // tamaño más equilibrado
-    fontWeight: "bold",
-    marginBottom: 1,
-    textTransform: "uppercase",
-  },
-  docNumber: {
-    fontSize: 11,
-    fontWeight: "bold",
-    marginBottom: 1,
-  },
-  docFecha: {
-    fontSize: 10,
-    color: "#333",
-  },
+  fontFamily: "Poppins",
+  fontSize: 20,
+  fontWeight: "bold",
+  marginBottom: 0,   // 👈 sin margen extra
+  lineHeight: 1,   // 👈 más compacto
+  textTransform: "uppercase",
+},
+docNumber: {
+  fontSize: 11,
+  fontWeight: "bold",
+  marginBottom: 0,   // 👈 quitamos espacio vertical
+  lineHeight: 1,
+},
+docFecha: {
+  fontSize: 10,
+  color: "#333",
+  lineHeight: 1,   // 👈 evita separar demasiado
+},
+
 });
 
 export default function HeaderPDF({ empresa, numeroProforma, fecha }) {
