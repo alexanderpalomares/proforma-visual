@@ -12,54 +12,59 @@ const styles = StyleSheet.create({
     borderColor: "#D9D9D9",
   },
 
-  // Bloque empresa
   empresaBlock: {
     flexDirection: "row",
     alignItems: "center",
   },
   logoBox: {
-    width: 40,        // más compacto que antes
-    height: 40,
-    borderRadius: 6,
-    borderWidth: 1,
-    marginRight: 8,
+    width: 70,      // igual que en previsualización
+    height: 70,
+    borderRadius: 10,
     overflow: "hidden",
+    marginRight: 10,
   },
   logo: {
     width: "100%",
     height: "100%",
     objectFit: "contain",
   },
-  headerTextGroup: {
+  textGroup: {
     flexDirection: "column",
     justifyContent: "center",
-    lineHeight: 1,
+    lineHeight: 1.1,
   },
   empresaNombre: {
     fontFamily: "Poppins",
-    fontSize: 11,     // ajustado
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 2,
     lineHeight: 1.1,
   },
   empresaDato: {
-    fontSize: 9,      // más pequeño
+    fontSize: 11,
     color: "#333",
-    lineHeight: 1,  // menos espacio entre líneas
+    lineHeight: 1.1,
   },
 
-  // Bloque documento
-  proformaBlock: {
+  right: {
     textAlign: "right",
+    lineHeight: 1.1,
   },
-  proformaTitle: {
-    fontSize: 14,
+  docTitle: {
+    fontSize: 28,
     fontWeight: "bold",
     fontFamily: "Poppins",
+    marginBottom: 2,
+    textTransform: "uppercase",
   },
-  proformaNumber: {
-    fontSize: 10,
-    marginTop: 2,
+  docNumber: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+  docFecha: {
+    fontSize: 11,
+    color: "#333",
   },
 });
 
@@ -72,10 +77,10 @@ export default function HeaderPDF({ empresa, numeroProforma, fecha }) {
           {empresa.logo ? (
             <Image src={empresa.logo} style={styles.logo} />
           ) : (
-            <Text style={{ fontSize: 7, color: "#999" }}>Logo</Text>
+            <Text style={{ fontSize: 8, color: "#999" }}>Logo</Text>
           )}
         </View>
-        <View style={styles.headerTextGroup}>
+        <View style={styles.textGroup}>
           <Text style={styles.empresaNombre}>{empresa.nombre}</Text>
           {empresa.ruc && <Text style={styles.empresaDato}>{empresa.ruc}</Text>}
           {empresa.direccion && <Text style={styles.empresaDato}>{empresa.direccion}</Text>}
@@ -86,10 +91,10 @@ export default function HeaderPDF({ empresa, numeroProforma, fecha }) {
       </View>
 
       {/* Bloque documento */}
-      <View style={styles.proformaBlock}>
-        <Text style={styles.proformaTitle}>PROFORMA</Text>
-        {numeroProforma && <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>}
-        {fecha && <Text style={{ fontSize: 9 }}>{fecha}</Text>}
+      <View style={styles.right}>
+        <Text style={styles.docTitle}>PROFORMA</Text>
+        {numeroProforma && <Text style={styles.docNumber}>N°: {numeroProforma}</Text>}
+        {fecha && <Text style={styles.docFecha}>{fecha}</Text>}
       </View>
     </View>
   );
