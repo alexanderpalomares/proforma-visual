@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
 
   docTitle: {
     fontFamily: "Helvetica-Bold", // 👈 usa Helvetica en negrita
-    fontSize: 40,                 // 👈 ahora crecerá de verdad
+    fontSize: 15,                 // 👈 ahora crecerá de verdad
     marginBottom: 4,
     lineHeight: 1.1,               // 👈 relativo, no absoluto
     textTransform: "uppercase",
