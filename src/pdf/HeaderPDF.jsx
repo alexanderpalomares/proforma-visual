@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   fontFamily: "Poppins",
   fontSize: 20,
   fontWeight: "bold",
-  marginBottom: 0,   // 👈 sin margen extra
+  marginBottom: 1,   // 👈 sin margen extra
   lineHeight: 1,   // 👈 más compacto
   textTransform: "uppercase",
 },
