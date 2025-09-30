@@ -29,61 +29,48 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 8,
   },
-  logo: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-  },
-  headerTextGroup: {
-    flexDirection: "column",
-    justifyContent: "center",
-    lineHeight: 1.1,
-    color: "#000",
-  },
-  empresaNombre: { fontFamily: "Poppins", fontSize: 12, fontWeight: "bold" },
+  logo: { width: "100%", height: "100%", objectFit: "contain" },
+  headerTextGroup: { flexDirection: "column", lineHeight: 1.1, color: "#000" },
+  empresaNombre: { fontSize: 12, fontWeight: "bold" },
   empresaDato: { fontSize: 10, color: "#333" },
   proformaBlock: { textAlign: "right" },
-  proformaTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    fontFamily: "Poppins",
-  },
+  proformaTitle: { fontSize: 14, fontWeight: "bold" },
   proformaNumber: { fontSize: 11, marginTop: 2 },
 });
 
-const HeaderPDF = ({ empresa, numeroProforma, cliente }) => (
-  <View style={styles.headerContainer}>
-    <View style={styles.empresaBlock}>
-      <View style={styles.logoBox}>
-        {empresa.logo ? (
-          <Image src={empresa.logo} style={styles.logo} />
-        ) : (
-          <Text style={{ fontSize: 8, color: "#999" }}>Logo</Text>
-        )}
+export default function HeaderPDF({ empresa, numeroProforma, cliente }) {
+  return (
+    <View style={styles.headerContainer}>
+      <View style={styles.empresaBlock}>
+        <View style={styles.logoBox}>
+          {empresa.logo ? (
+            <Image src={empresa.logo} style={styles.logo} />
+          ) : (
+            <Text style={{ fontSize: 8, color: "#999" }}>Logo</Text>
+          )}
+        </View>
+        <View style={styles.headerTextGroup}>
+          <Text style={styles.empresaNombre}>{empresa.nombre}</Text>
+          {empresa.ruc && <Text style={styles.empresaDato}>{empresa.ruc}</Text>}
+          {empresa.direccion && (
+            <Text style={styles.empresaDato}>{empresa.direccion}</Text>
+          )}
+          {empresa.telefono && (
+            <Text style={styles.empresaDato}>{empresa.telefono}</Text>
+          )}
+          {empresa.correo && (
+            <Text style={styles.empresaDato}>{empresa.correo}</Text>
+          )}
+          {empresa.web && <Text style={styles.empresaDato}>{empresa.web}</Text>}
+        </View>
       </View>
-      <View style={styles.headerTextGroup}>
-        <Text style={styles.empresaNombre}>{empresa.nombre}</Text>
-        {empresa.ruc && <Text style={styles.empresaDato}>{empresa.ruc}</Text>}
-        {empresa.direccion && (
-          <Text style={styles.empresaDato}>{empresa.direccion}</Text>
+      <View style={styles.proformaBlock}>
+        <Text style={styles.proformaTitle}>PROFORMA</Text>
+        {numeroProforma && (
+          <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>
         )}
-        {empresa.telefono && (
-          <Text style={styles.empresaDato}>{empresa.telefono}</Text>
-        )}
-        {empresa.correo && (
-          <Text style={styles.empresaDato}>{empresa.correo}</Text>
-        )}
-        {empresa.web && <Text style={styles.empresaDato}>{empresa.web}</Text>}
+        {cliente.fecha && <Text>{cliente.fecha}</Text>}
       </View>
     </View>
-    <View style={styles.proformaBlock}>
-      <Text style={styles.proformaTitle}>PROFORMA</Text>
-      {numeroProforma && (
-        <Text style={styles.proformaNumber}>N°: {numeroProforma}</Text>
-      )}
-      {cliente?.fecha && <Text>{cliente.fecha}</Text>}
-    </View>
-  </View>
-);
-
-export default HeaderPDF;
+  );
+}

@@ -1,6 +1,12 @@
-// src/pdf/ProductoPDF.jsx
+// src/pdf/ProductoRowPDF.jsx
 import React from "react";
 import { View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+
+const PEN = new Intl.NumberFormat("es-PE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const formatMoney = (n) => PEN.format(Number(n) || 0);
 
 const styles = StyleSheet.create({
   productoRow: {
@@ -27,9 +33,8 @@ const styles = StyleSheet.create({
     width: 280,
   },
   productoName: {
-    fontFamily: "Poppins",
-    fontWeight: "bold",
     fontSize: 13,
+    fontWeight: "bold",
     textTransform: "uppercase",
     marginBottom: 4,
     textAlign: "right",
@@ -51,22 +56,13 @@ const styles = StyleSheet.create({
   priceValue: { fontSize: 11, fontWeight: "bold" },
 });
 
-// Función auxiliar para formatear moneda en PEN
-const PEN = new Intl.NumberFormat("es-PE", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-const formatMoney = (n) => PEN.format(Number(n) || 0);
-
-const ProductoPDF = ({ producto, idx }) => {
+export default function ProductoRowPDF({ producto, idx }) {
   const precio = Number(producto.precio) || 0;
   const cantidad = Number(producto.cantidad) || 0;
   const importe = precio * cantidad;
 
   return (
-    <View
-      style={[styles.productoRow, idx > 0 && styles.productoSeparator]}
-    >
+    <View style={[styles.productoRow, idx > 0 && styles.productoSeparator]}>
       {producto.imagenForPdf && (
         <Image src={producto.imagenForPdf} style={styles.productoImgLeft} />
       )}
@@ -93,6 +89,4 @@ const ProductoPDF = ({ producto, idx }) => {
       </View>
     </View>
   );
-};
-
-export default ProductoPDF;
+}

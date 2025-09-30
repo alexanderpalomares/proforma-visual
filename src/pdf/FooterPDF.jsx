@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     borderColor: "#E5E5E5",
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 12,
   },
   footerCol: { width: "32%" },
   footerTitle: {
@@ -23,15 +22,10 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 2,
   },
-  gracias: {
-    textAlign: "center",
-    marginTop: 12,
-    fontSize: 9,
-  },
 });
 
-const FooterPDF = ({ observaciones, banco, empresa }) => (
-  <>
+export default function FooterPDF({ observaciones, banco }) {
+  return (
     <View style={styles.footer}>
       {/* Observaciones */}
       <View style={styles.footerCol}>
@@ -39,18 +33,12 @@ const FooterPDF = ({ observaciones, banco, empresa }) => (
         <Text style={styles.footerText}>{observaciones || "—"}</Text>
       </View>
 
-      {/* Datos bancarios */}
+      {/* Banco */}
       <View style={styles.footerCol}>
         <Text style={styles.footerTitle}>Datos Bancarios:</Text>
-        {banco?.cuenta && (
-          <Text style={styles.footerText}>Cuenta: {banco.cuenta}</Text>
-        )}
-        {banco?.cci && (
-          <Text style={styles.footerText}>CCI: {banco.cci}</Text>
-        )}
-        {banco?.titular && (
-          <Text style={styles.footerText}>Titular: {banco.titular}</Text>
-        )}
+        {banco?.cuenta && <Text style={styles.footerText}>Cuenta: {banco.cuenta}</Text>}
+        {banco?.cci && <Text style={styles.footerText}>CCI: {banco.cci}</Text>}
+        {banco?.titular && <Text style={styles.footerText}>Titular: {banco.titular}</Text>}
       </View>
 
       {/* Términos */}
@@ -61,12 +49,5 @@ const FooterPDF = ({ observaciones, banco, empresa }) => (
         <Text style={styles.footerText}>- No se aceptan devoluciones sin comprobante.</Text>
       </View>
     </View>
-
-    {/* Mensaje de agradecimiento */}
-    <Text style={styles.gracias}>
-      Gracias por confiar en {empresa?.nombre}.
-    </Text>
-  </>
-);
-
-export default FooterPDF;
+  );
+}
