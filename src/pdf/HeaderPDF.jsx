@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   logoBox: {
-    width: 60,
-    height: 60,
+    width: 20,
+    height: 20,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#E5E5E5",
