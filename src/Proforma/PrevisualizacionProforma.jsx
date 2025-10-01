@@ -1,10 +1,8 @@
 // src/Proforma/PrevisualizacionProforma.jsx
 import React, { useMemo, useRef, useState } from "react";
-import { pdf } from "@react-pdf/renderer";
-import ProformaPDF from "../pdf/ProformaPDF";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// Bloques refactorizados
+// Bloques refactorizados (HTML normal)
 import Header from "./Header";
 import ClienteInfo from "./ClienteInfo";
 import ProductoRow from "./ProductoRow";
@@ -18,25 +16,58 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-const convertToPngBase64 = (fileOrUrl) =>
+// Convierte un IMG src en dataURL PNG
+const toDataURL = (src) =>
   new Promise((resolve, reject) => {
     try {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
         resolve(canvas.toDataURL("image/png"));
       };
-      img.onerror = (err) => reject(err);
-      img.src = fileOrUrl;
+      img.onerror = reject;
+      img.src = src;
     } catch (e) {
       reject(e);
     }
   });
+
+// Recorre el nodo clonado y reemplaza <img src> por dataURL
+const inlineImagesInNode = async (rootEl) => {
+  const imgs = rootEl.querySelectorAll("img");
+  await Promise.all(
+    Array.from(imgs).map(async (img) => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+      try {
+        const dataUrl = await toDataURL(src);
+        img.setAttribute("src", dataUrl);
+      } catch (_) {}
+    })
+  );
+};
+
+// Construye HTML completo para Puppeteer
+const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
+  const head = `
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { margin: 0; padding: 0; background: #fff; }
+      .pdf-page { width: 794px; margin: 0 auto; font-family: Poppins, Helvetica, Arial, sans-serif; }
+      @page { size: A4; margin: 20px; }
+    </style>
+  `;
+  const body = `<div class="pdf-page">${node.outerHTML}</div>`;
+  return `<!doctype html><html><head><title>${title}</title>${head}</head><body>${body}</body></html>`;
+};
 
 // ─────────────────── Estilos globales ───────────────────
 const styles = {
@@ -118,39 +149,39 @@ export default function PrevisualizacionProforma({
     }, 0);
   }, [productos]);
 
+  // URL del backend PDF
+  const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || "http://localhost:4000";
+
   const handleExportPdfPro = async () => {
     try {
       setPdfStatus("loading");
       const numero = getNextProformaNumber();
       setNumeroFinal(numero);
 
-      const productosReady = await Promise.all(
-        productos.map(async (p) => {
-          if (p.imagenForPdf) return p;
-          const src = p.imagenFile || p.imagenPreview || p.imagen;
-          if (!src) return p;
-          try {
-            const imagenForPdf = await convertToPngBase64(src);
-            return { ...p, imagenForPdf };
-          } catch {
-            return p;
-          }
-        })
-      );
+      // 1) Clonar nodo del preview
+      const original = ref.current;
+      const clone = original.cloneNode(true);
 
-      const blob = await pdf(
-        <ProformaPDF
-          empresa={empresa}
-          cliente={cliente}
-          productos={productosReady}
-          numeroProforma={numero}
-          tipoDocumento={tipoDocumento}
-          observaciones={observaciones}
-          banco={banco}
-        />
-      ).toBlob();
+      // 2) Incrustar imágenes
+      await inlineImagesInNode(clone);
 
+      // 3) Construir HTML
+      const html = buildHTMLForPDF(clone, { title: `${tipoDocumento} ${numero}` });
+
+      // 4) Enviar al backend
+      const resp = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          html,
+          filename: `${tipoDocumento}_${numero}.pdf`,
+        }),
+      });
+
+      if (!resp.ok) throw new Error("Fallo al generar PDF en el servidor");
+      const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
       a.href = url;
       a.download = `${tipoDocumento}_${numero}.pdf`;
@@ -163,11 +194,11 @@ export default function PrevisualizacionProforma({
         onLimpiarCliente?.();
         onLimpiarProductos?.();
         onVolver?.();
-      }, 2500);
+      }, 2000);
     } catch (err) {
-      console.error("Error al generar PDF:", err);
+      console.error("Export server PDF error:", err);
       setPdfStatus("error");
-      setTimeout(() => setPdfStatus("idle"), 3500);
+      setTimeout(() => setPdfStatus("idle"), 3000);
     }
   };
 
