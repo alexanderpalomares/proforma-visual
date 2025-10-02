@@ -23,13 +23,13 @@ app.post("/api/pdf", async (req, res) => {
     console.log("📥 Recibida petición para generar PDF:", { filename, htmlLength: html.length });
 
     browser = await puppeteer.launch({
-      headless: true, // 👈 importante en Render
+      headless: true, // 👈 en Render debe ser true
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
-    console.log("✅ Navegador lanzado correctamente");
+    console.log("✅ Puppeteer lanzado correctamente");
 
     const page = await browser.newPage();
-    console.log("✅ Nueva página abierta");
+    console.log("✅ Página nueva abierta");
 
     await page.setContent(html, { waitUntil: ["domcontentloaded", "networkidle0"] });
     console.log("✅ HTML cargado en Puppeteer");
@@ -43,14 +43,14 @@ app.post("/api/pdf", async (req, res) => {
       preferCSSPageSize: true,
       margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" }
     });
-    console.log("✅ PDF generado, tamaño:", pdfBuffer.length);
+    console.log("✅ PDF generado, tamaño en bytes:", pdfBuffer.length);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(pdfBuffer);
 
   } catch (err) {
-    console.error("🔥 Error generando PDF:", err.message);
+    console.error("🔥 Error al generar el PDF:", err.message);
     console.error("🔥 Stack completo:", err.stack);
     res.status(500).json({ error: "Error al generar el PDF", details: err.message });
   } finally {
@@ -62,4 +62,4 @@ app.post("/api/pdf", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 PDF server listo en http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 PDF server escuchando en http://localhost:${PORT}`));
