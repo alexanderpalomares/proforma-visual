@@ -2,21 +2,18 @@
 import React, { useMemo, useRef, useState } from "react";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-// Bloques refactorizados (HTML normal)
 import Header from "./Header";
 import ClienteInfo from "./ClienteInfo";
 import ProductoRow from "./ProductoRow";
 import Totales from "./Totales";
 import Footer from "./Footer";
 
-// ─────────────────── Función utilitaria ───────────────────
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// Convierte un IMG src en dataURL PNG
 const toDataURL = (src) =>
   new Promise((resolve, reject) => {
     try {
@@ -37,7 +34,6 @@ const toDataURL = (src) =>
     }
   });
 
-// Recorre el nodo clonado y reemplaza <img src> por dataURL
 const inlineImagesInNode = async (rootEl) => {
   const imgs = rootEl.querySelectorAll("img");
   await Promise.all(
@@ -52,7 +48,6 @@ const inlineImagesInNode = async (rootEl) => {
   );
 };
 
-// Construye HTML completo para Puppeteer
 const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   const head = `
     <meta charset="utf-8"/>
@@ -69,7 +64,6 @@ const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   return `<!doctype html><html><head><title>${title}</title>${head}</head><body>${body}</body></html>`;
 };
 
-// ─────────────────── Estilos globales ───────────────────
 const styles = {
   page: {
     width: 794,
@@ -127,13 +121,11 @@ const styles = {
 export default function PrevisualizacionProforma({
   empresa = {},
   cliente = {},
+  documento = {},
   productos = [],
-  tipoDocumento = "PROFORMA",
   observaciones = "",
   banco = {},
   onVolver = () => {},
-  onLimpiarCliente = () => {},
-  onLimpiarProductos = () => {},
 }) {
   const ref = useRef(null);
   const [pdfStatus, setPdfStatus] = useState("idle");
@@ -149,7 +141,6 @@ export default function PrevisualizacionProforma({
     }, 0);
   }, [productos]);
 
-  // URL del backend PDF
   const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || "http://localhost:4000";
 
   const handleExportPdfPro = async () => {
@@ -158,23 +149,18 @@ export default function PrevisualizacionProforma({
       const numero = getNextProformaNumber();
       setNumeroFinal(numero);
 
-      // 1) Clonar nodo del preview
       const original = ref.current;
       const clone = original.cloneNode(true);
-
-      // 2) Incrustar imágenes
       await inlineImagesInNode(clone);
 
-      // 3) Construir HTML
-      const html = buildHTMLForPDF(clone, { title: `${tipoDocumento} ${numero}` });
+      const html = buildHTMLForPDF(clone, { title: `${documento.tipo || "PROFORMA"} ${numero}` });
 
-      // 4) Enviar al backend
       const resp = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           html,
-          filename: `${tipoDocumento}_${numero}.pdf`,
+          filename: `${documento.tipo || "PROFORMA"}_${numero}.pdf`,
         }),
       });
 
@@ -184,15 +170,13 @@ export default function PrevisualizacionProforma({
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${tipoDocumento}_${numero}.pdf`;
+      a.download = `${documento.tipo || "PROFORMA"}_${numero}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
 
       setPdfStatus("success");
       setTimeout(() => {
         setPdfStatus("idle");
-        onLimpiarCliente?.();
-        onLimpiarProductos?.();
         onVolver?.();
       }, 2000);
     } catch (err) {
@@ -215,11 +199,6 @@ export default function PrevisualizacionProforma({
 
   return (
     <div>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-        rel="stylesheet"
-      />
-
       {pdfStatus === "success" && (
         <div style={styles.overlaySuccess}>
           <div style={styles.successBox}>✅ Documento generado con éxito</div>
@@ -227,28 +206,19 @@ export default function PrevisualizacionProforma({
       )}
 
       <div ref={ref} style={styles.page}>
-        {/* HEADER */}
         <Header
           empresa={empresa}
           numero={numeroParaMostrar}
           fecha={cliente.fecha}
-          tipoDocumento={tipoDocumento}
+          tipoDocumento={documento.tipo || "PROFORMA"}
         />
-
-        {/* CLIENTE */}
         <ClienteInfo cliente={cliente} />
-
-        {/* PRODUCTOS */}
         <div>
           {productos.map((p, idx) => (
             <ProductoRow key={idx} producto={p} idx={idx} formatMoney={formatMoney} />
           ))}
         </div>
-
-        {/* TOTALES */}
         <Totales total={total} formatMoney={formatMoney} />
-
-        {/* FOOTER */}
         <Footer empresa={empresa} observaciones={observaciones} banco={banco} />
       </div>
 
@@ -265,7 +235,11 @@ export default function PrevisualizacionProforma({
           {pdfStatus === "error" && "Error al generar PDF"}
         </button>
 
-        <button type="button" onClick={onVolver} style={{ ...styles.btn, ...styles.btnGray }}>
+        <button
+          type="button"
+          onClick={onVolver}
+          style={{ ...styles.btn, ...styles.btnGray }}
+        >
           Volver
         </button>
       </div>

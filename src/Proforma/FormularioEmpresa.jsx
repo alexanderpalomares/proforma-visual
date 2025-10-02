@@ -1,83 +1,81 @@
 import React, { useRef } from "react";
 
-export default function FormularioEmpresa({ empresa, setEmpresa }) {
+export default function FormularioEmpresa({ data = {}, onChange }) {
   const fileRef = useRef(null);
-  const input =
+  const inputClass =
     "w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
 
-  const onChange = (e) =>
-    setEmpresa({ [e.target.name]: e.target.value }); // ✅ pasa solo el campo
+  const handleInput = (e) =>
+    onChange({ ...data, [e.target.name]: e.target.value });
 
-  // Permite subir archivo y guarda DataURL en empresa.logo
   const onLogoFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setEmpresa({ logo: reader.result }); // ✅ solo actualiza logo
+      onChange({ ...data, logo: reader.result });
     };
     reader.readAsDataURL(file);
   };
 
   const limpiarLogo = () => {
     if (fileRef.current) fileRef.current.value = "";
-    setEmpresa({ logo: "" }); // ✅ solo limpia logo
+    onChange({ ...data, logo: "" });
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input
-        className={input}
+        className={inputClass}
         name="nombre"
         placeholder="Ferretería Kike"
-        value={empresa.nombre || ""}
-        onChange={onChange}
+        value={data.nombre || ""}
+        onChange={handleInput}
       />
       <input
-        className={input}
+        className={inputClass}
         name="ruc"
         placeholder="20601648391"
-        value={empresa.ruc || ""}
+        value={data.ruc || ""}
         onChange={(e) =>
-          setEmpresa({
-            ruc: e.target.value.replace(/\D/g, "").slice(0, 11),
-          })
+          onChange({ ...data, ruc: e.target.value.replace(/\D/g, "").slice(0, 11) })
         }
       />
       <input
-        className={input}
+        className={inputClass}
         name="direccion"
         placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
-        value={empresa.direccion || ""}
-        onChange={onChange}
+        value={data.direccion || ""}
+        onChange={handleInput}
       />
       <input
-        className={input}
+        className={inputClass}
         name="telefono"
         placeholder="987916570"
-        value={empresa.telefono || ""}
+        value={data.telefono || ""}
         onChange={(e) =>
-          setEmpresa({
+          onChange({
+            ...data,
             telefono: e.target.value.replace(/[^\d+]/g, ""),
           })
         }
       />
       <input
-        className={input}
+        className={inputClass}
         name="correo"
         placeholder="ferreteriakike@gmail.com"
-        value={empresa.correo || ""}
-        onChange={onChange}
+        value={data.correo || ""}
+        onChange={handleInput}
       />
       <input
-        className={input}
+        className={inputClass}
         name="web"
         placeholder="www.ferreteriakike.com"
-        value={empresa.web || ""}
-        onChange={onChange}
+        value={data.web || ""}
+        onChange={handleInput}
       />
 
-      {/* Subida de logo en cuadro cuadrado */}
+      {/* Subida de logo */}
       <div className="md:col-span-2">
         <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
           <input
@@ -88,14 +86,13 @@ export default function FormularioEmpresa({ empresa, setEmpresa }) {
             onChange={onLogoFile}
           />
 
-          {empresa.logo ? (
+          {data.logo ? (
             <>
               <img
-                src={empresa.logo}
+                src={data.logo}
                 alt="Logo"
                 className="w-full h-full object-contain z-10 pointer-events-none"
               />
-
               <button
                 type="button"
                 aria-label="Quitar logo"

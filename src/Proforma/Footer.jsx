@@ -18,7 +18,7 @@ export default function Footer({ empresa = {}, observaciones = "", banco = {} })
     },
     col: {
       flex: 1,
-      minWidth: 220, // asegura buena visualización en pantallas pequeñas
+      minWidth: 220,
     },
     title: {
       fontWeight: 600,
@@ -54,10 +54,12 @@ export default function Footer({ empresa = {}, observaciones = "", banco = {} })
         {/* Datos Bancarios */}
         <div style={styles.col}>
           <div style={styles.title}>Datos Bancarios:</div>
-          {banco?.cuenta && <p style={styles.text}>Cuenta: {banco.cuenta}</p>}
+          {banco?.cuentaBancaria && (
+            <p style={styles.text}>Cuenta: {banco.cuentaBancaria}</p>
+          )}
           {banco?.cci && <p style={styles.text}>CCI: {banco.cci}</p>}
           {banco?.titular && <p style={styles.text}>Titular: {banco.titular}</p>}
-          {!banco?.cuenta && !banco?.cci && !banco?.titular && (
+          {!banco?.cuentaBancaria && !banco?.cci && !banco?.titular && (
             <p style={styles.text}>No se registraron datos bancarios</p>
           )}
         </div>

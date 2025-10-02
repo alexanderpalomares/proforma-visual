@@ -1,8 +1,11 @@
-// src/Proforma/FormularioTipoDocumento.jsx
 import React from "react";
 
-export default function FormularioTipoDocumento({ tipoDocumento, setTipoDocumento }) {
+export default function FormularioTipoDocumento({ data = {}, onChange }) {
   const tipos = ["PROFORMA", "NOTA DE PEDIDO", "NOTA DE VENTA"];
+
+  const handleSelect = (tipo) => {
+    onChange({ ...data, tipo });
+  };
 
   const styles = {
     container: {
@@ -43,8 +46,8 @@ export default function FormularioTipoDocumento({ tipoDocumento, setTipoDocument
         {tipos.map((tipo) => (
           <button
             key={tipo}
-            style={styles.button(tipo === tipoDocumento)}
-            onClick={() => setTipoDocumento(tipo)}
+            style={styles.button(data.tipo === tipo)}
+            onClick={() => handleSelect(tipo)}
             type="button"
           >
             {tipo}

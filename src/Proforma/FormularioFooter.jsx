@@ -1,6 +1,11 @@
 import React from "react";
 
-export default function FormularioFooter({ formData, setFormData }) {
+export default function FormularioFooter({ data = {}, onChange }) {
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+    onChange({ ...data, [name]: value });
+  };
+
   const styles = {
     wrap: {
       marginTop: 20,
@@ -51,39 +56,32 @@ export default function FormularioFooter({ formData, setFormData }) {
     },
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   return (
     <div style={styles.wrap}>
       <div style={styles.title}>Observaciones y Datos Bancarios</div>
 
       <div style={styles.row}>
-        {/* Observaciones */}
         <div style={styles.col}>
           <div style={styles.group}>
             <label style={styles.label}>Observaciones</label>
             <textarea
               name="observaciones"
-              value={formData.observaciones || ""}
-              onChange={handleChange}
+              value={data.observaciones || ""}
+              onChange={handleInput}
               style={styles.textarea}
               placeholder="Ej: La entrega está sujeta a stock disponible..."
             />
           </div>
         </div>
 
-        {/* Datos Bancarios */}
         <div style={styles.col}>
           <div style={styles.group}>
             <label style={styles.label}>Cuenta Bancaria</label>
             <input
               type="text"
               name="cuentaBancaria"
-              value={formData.cuentaBancaria || ""}
-              onChange={handleChange}
+              value={data.cuentaBancaria || ""}
+              onChange={handleInput}
               style={styles.input}
               placeholder="Ej: 123-4567890-0-11"
             />
@@ -94,8 +92,8 @@ export default function FormularioFooter({ formData, setFormData }) {
             <input
               type="text"
               name="cci"
-              value={formData.cci || ""}
-              onChange={handleChange}
+              value={data.cci || ""}
+              onChange={handleInput}
               style={styles.input}
               placeholder="Ej: 00212300456789001199"
             />
@@ -106,8 +104,8 @@ export default function FormularioFooter({ formData, setFormData }) {
             <input
               type="text"
               name="titular"
-              value={formData.titular || ""}
-              onChange={handleChange}
+              value={data.titular || ""}
+              onChange={handleInput}
               style={styles.input}
               placeholder="Ej: Proveedores del Oriente E.I.R.L."
             />
