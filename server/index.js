@@ -6,6 +6,11 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "20mb" })); // por si mandamos imágenes base64
 
+// 🚀 Endpoint de prueba
+app.get("/", (req, res) => {
+  res.send("Servidor de generación de PDF activo 🚀");
+});
+
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
   if (!html) return res.status(400).json({ error: "Falta el HTML" });
