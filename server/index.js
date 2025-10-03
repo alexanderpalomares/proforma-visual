@@ -2,8 +2,12 @@ import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
-import path from "path";
+import path, { dirname, join } from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -14,11 +18,11 @@ app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
 
-// 📂 Ubicación de fuentes en Base64
-const FONTS_DIR = path.join(process.cwd(), "server", "fonts");
+// 📂 Ubicación de fuentes en Base64 (✅ corregida para evitar server/server)
+const FONTS_DIR = join(__dirname, "fonts");
 
 function readBase64File(name) {
-  const filePath = path.join(FONTS_DIR, `${name}.b64.txt`);
+  const filePath = join(FONTS_DIR, `${name}.b64.txt`);
   return fs.readFileSync(filePath, "utf8");
 }
 
