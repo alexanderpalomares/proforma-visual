@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import path from "path";
+import { pathToFileURL } from "url";
+import fs from "fs";
 
 const app = express();
 app.use(cors());
@@ -12,38 +15,46 @@ app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
 
-/**
- * 🎨 Fuentes Poppins incrustadas en Base64 (.woff2)
- * 400 (Regular), 600 (SemiBold), 700 (Bold), 800 (ExtraBold)
- * ⚠️ Sustituye los comentarios /* ... */ 
-const POPPINS_CSS = `
+//
+// 🧠 1. Detectar la carpeta de fuentes en Render
+//
+const ROOT = process.cwd(); // Ej: /opt/render/project/src
+const CANDIDATE_A = path.join(ROOT, "server", "public", "fonts");
+const CANDIDATE_B = path.join(ROOT, "public", "fonts");
+const FONTS_DIR = fs.existsSync(CANDIDATE_A) ? CANDIDATE_A : CANDIDATE_B;
+
+const furl = (filename) => pathToFileURL(path.join(FONTS_DIR, filename)).href;
+
+//
+// 🧠 2. Definir CSS con rutas absolutas file://
+//
+const POPPINS_FILE_CSS = `
 <style>
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
-  src: url(data:font/woff2;base64,/* ... tu base64 400 ... */) format('woff2');
+  src: url('${furl("Poppins-Regular.ttf")}') format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 600;
-  src: url(data:font/woff2;base64,/* ... tu base64 600 ... */) format('woff2');
+  src: url('${furl("Poppins-SemiBold.ttf")}') format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url(data:font/woff2;base64,/* ... tu base64 700 ... */) format('woff2');
+  src: url('${furl("Poppins-Bold.ttf")}') format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 800;
-  src: url(data:font/woff2;base64,/* ... tu base64 800 ... */) format('woff2');
+  src: url('${furl("Poppins-ExtraBold.ttf")}') format('truetype');
 }
 
-/* Forzamos Poppins por herencia */
 html, body, * {
   font-family: 'Poppins', Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
@@ -52,16 +63,18 @@ html, body, * {
 </style>
 `;
 
-/** ✅ Inyecta Poppins en <head> y limpia Google Fonts si existiese */
+//
+// 🧠 3. Inyectar CSS en el HTML entrante
+//
 function injectPoppinsFonts(html) {
   return html
     .replace(/<link[^>]+fonts\.googleapis[^>]*>/gi, "")
-    .replace(/<head>/i, `<head>${POPPINS_CSS}`);
+    .replace(/<head>/i, `<head>${POPPINS_FILE_CSS}`);
 }
 
-/**
- * 📄 Generación real de PDFs desde la app
- */
+//
+// 📄 4. Endpoint real de generación de PDFs
+//
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
   if (!html) return res.status(400).json({ error: "Falta el HTML" });
@@ -82,7 +95,10 @@ app.post("/api/pdf", async (req, res) => {
 
     await page.emulateMediaType("screen");
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
-    await page.evaluateHandle("document.fonts.ready");
+
+    // 👇 Verificación de carga real de la fuente
+    const fontsReady = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
+    console.log("¿Poppins cargó en proforma? =>", fontsReady);
 
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -102,10 +118,9 @@ app.post("/api/pdf", async (req, res) => {
   }
 });
 
-/**
- * 🧪 TEST: Endpoint de diagnóstico para aislar el problema de fuentes
- * Genera un PDF mínimo con Poppins embebido para verificar si Chromium + Render lo soportan realmente.
- */
+//
+// 🧪 5. Endpoint de diagnóstico /api/pdf/test
+//
 app.get("/api/pdf/test", async (req, res) => {
   let browser;
   try {
@@ -115,7 +130,7 @@ app.get("/api/pdf/test", async (req, res) => {
         <head>
           <meta charset="utf-8"/>
           <title>Test Poppins</title>
-          ${POPPINS_CSS}
+          ${POPPINS_FILE_CSS}
           <style>
             body {
               font-family: 'Poppins', sans-serif;
@@ -150,7 +165,9 @@ app.get("/api/pdf/test", async (req, res) => {
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
     await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
-    await page.evaluateHandle("document.fonts.ready");
+
+    const ok = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
+    console.log("¿Poppins cargó en test? =>", ok);
 
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -169,5 +186,8 @@ app.get("/api/pdf/test", async (req, res) => {
   }
 });
 
+//
+// 🚀 Start server
+//
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 PDF server listo en http://localhost:${PORT}`));
