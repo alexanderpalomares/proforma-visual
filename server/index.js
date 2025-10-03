@@ -15,8 +15,7 @@ app.get("/", (req, res) => {
 /**
  * 🎨 Fuentes Poppins incrustadas en Base64 (.woff2)
  * 400 (Regular), 600 (SemiBold), 700 (Bold), 800 (ExtraBold)
- * ⚠️ Sustituye los comentarios /* ... */ por tus cadenas base64 reales si aún no lo hiciste.
- */
+ * ⚠️ Sustituye los comentarios /* ... */ 
 const POPPINS_CSS = `
 <style>
 @font-face {
