@@ -17,10 +17,10 @@
     "vite": "^5.4.20"
   },
   "dependencies": {
-    "@sparticuz/chromium": "^140.0.0",
+    "@sparticuz/chromium": "^119.0.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
-    "puppeteer-core": "^24.23.0",
+    "puppeteer-core": "^22.11.0",
     "react-to-print": "^3.1.1"
   }
 }
