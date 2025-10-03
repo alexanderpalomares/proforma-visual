@@ -1,3 +1,4 @@
+// index.js
 import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer-core";
@@ -11,14 +12,20 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// ✅ CORS configurado para permitir llamadas desde tu dominio de Vercel
+// ✅ CORS configurado correctamente para Vercel y desarrollo local
 app.use(
   cors({
-    origin: ["https://tu-frontend-vercel.vercel.app", "http://localhost:5173"], // 👈 pon aquí tu dominio frontend real
+    origin: ["https://rapiproforma.vercel.app", "http://localhost:5173"],
     methods: ["POST", "GET"],
     allowedHeaders: ["Content-Type"],
   })
 );
+
+// 📝 (Opcional) Log para verificar el origin de cada request
+app.use((req, res, next) => {
+  console.log("🌐 Petición desde origin:", req.headers.origin);
+  next();
+});
 
 app.use(express.json({ limit: "20mb" }));
 
