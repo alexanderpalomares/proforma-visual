@@ -14,13 +14,13 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ✅ Versión optimizada: escala + compresión JPEG
+// ✅ Optimiza imágenes para incrustarlas como Base64 (para Puppeteer)
 const toDataURL = (src) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      const maxWidth = 600; // Ancho máximo permitido
+      const maxWidth = 600;
       const scale = Math.min(1, maxWidth / img.width);
       const canvas = document.createElement("canvas");
       canvas.width = img.width * scale;
@@ -29,7 +29,6 @@ const toDataURL = (src) =>
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // Convertir a JPEG comprimido (70%)
       const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
       resolve(dataUrl);
     };
@@ -51,15 +50,15 @@ const inlineImagesInNode = async (rootEl) => {
   );
 };
 
+// 🧠 Genera HTML autónomo (sin Google Fonts) para enviar al backend PDF
 const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   const head = `
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"/>
     <style>
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       html, body { margin: 0; padding: 0; background: #fff; }
-      .pdf-page { width: 794px; margin: 0 auto; font-family: Poppins, Helvetica, Arial, sans-serif; }
+      .pdf-page { width: 794px; margin: 0 auto; font-family: 'Poppins', Helvetica, Arial, sans-serif; }
       @page { size: A4; margin: 20px; }
     </style>
   `;
@@ -73,7 +72,7 @@ const styles = {
     margin: "0 auto",
     padding: 24,
     backgroundColor: "#ffffff",
-    fontFamily: "Helvetica",
+    fontFamily: "Poppins, Helvetica, Arial, sans-serif",
     color: "#000",
   },
   actions: {
