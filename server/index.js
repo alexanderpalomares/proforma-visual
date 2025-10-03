@@ -2,12 +2,12 @@ import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
-import path, { dirname, join } from "path";
+import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -18,11 +18,11 @@ app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
 
-// 📂 Ubicación de fuentes en Base64 (✅ corregida para evitar server/server)
-const FONTS_DIR = join(__dirname, "fonts");
+// 📂 Ubicación de fuentes en Base64 (ajustada para server/ en raíz)
+const FONTS_DIR = path.join(process.cwd(), "server", "fonts");
 
 function readBase64File(name) {
-  const filePath = join(FONTS_DIR, `${name}.b64.txt`);
+  const filePath = path.join(FONTS_DIR, `${name}.b64.txt`);
   return fs.readFileSync(filePath, "utf8");
 }
 
@@ -32,32 +32,32 @@ const POPPINS_SEMIBOLD_B64 = readBase64File("Poppins-SemiBold");
 const POPPINS_BOLD_B64 = readBase64File("Poppins-Bold");
 const POPPINS_EXTRABOLD_B64 = readBase64File("Poppins-ExtraBold");
 
-// 🧠 CSS con las fuentes incrustadas en Base64
+// 🧠 CSS con las fuentes incrustadas en Base64 (MIME corregido)
 const POPPINS_BASE64_CSS = `
 <style>
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
-  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_REGULAR_B64}) format('truetype');
+  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_REGULAR_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 600;
-  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_SEMIBOLD_B64}) format('truetype');
+  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_SEMIBOLD_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_BOLD_B64}) format('truetype');
+  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_BOLD_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 800;
-  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_EXTRABOLD_B64}) format('truetype');
+  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_EXTRABOLD_B64}) format('truetype');
 }
 
 html, body, * {
@@ -95,6 +95,9 @@ app.post("/api/pdf", async (req, res) => {
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
 
     const fontsReady = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
     console.log("✅ ¿Poppins cargó en proforma? =>", fontsReady);
@@ -162,6 +165,10 @@ app.get("/api/pdf/test", async (req, res) => {
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
     await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+
     const ok = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
     console.log("✅ ¿Poppins cargó en test? =>", ok);
 
