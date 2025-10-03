@@ -28,7 +28,7 @@ app.post("/api/pdf", async (req, res) => {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless, // 👈 Render requiere headless
+        headless: chromium.headless, // Render requiere headless
       });
       console.log("✅ Puppeteer-Core logró lanzar Chromium");
     } catch (err) {
@@ -42,6 +42,10 @@ app.post("/api/pdf", async (req, res) => {
     await page.setContent(html, { waitUntil: ["domcontentloaded", "networkidle0"] });
     console.log("✅ HTML cargado en Puppeteer");
 
+    // 🆕 Esperar a que TODAS las fuentes estén cargadas
+    await page.evaluateHandle("document.fonts.ready");
+    console.log("✅ Todas las fuentes cargadas");
+
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
     console.log("✅ Viewport configurado");
 
@@ -49,14 +53,15 @@ app.post("/api/pdf", async (req, res) => {
       format: "A4",
       printBackground: true,
       preferCSSPageSize: true,
-      margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" }
+      margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
     });
+
     console.log("✅ PDF generado, tamaño:", pdfBuffer.length);
 
-    // ✅ MODIFICADO: cabeceras limpias y uso de res.end en lugar de res.send
+    // 🧼 Cabeceras limpias y uso de res.end
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.end(pdfBuffer); // ← importante: evita que Express meta charset=utf-8
+    res.end(pdfBuffer);
 
   } catch (err) {
     console.error("🔥 Error generando PDF:", err.message);
