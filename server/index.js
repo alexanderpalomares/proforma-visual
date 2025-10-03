@@ -13,9 +13,9 @@ app.get("/", (req, res) => {
 });
 
 /**
- * 🧠 CSS con fuentes Poppins embebidas en Base64 (400, 600, 700, 800)
- * Esto evita depender de Google Fonts en Render / Puppeteer headless.
- * Los .woff2 fueron convertidos a base64 previamente.
+ * 🎨 Fuentes Poppins incrustadas en Base64 (.woff2)
+ * Incluye: 400 (Regular), 600 (SemiBold), 700 (Bold), 800 (ExtraBold)
+ * Generadas desde los archivos TTF originales
  */
 const POPPINS_CSS = `
 <style>
@@ -23,7 +23,7 @@ const POPPINS_CSS = `
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
-  src: url(data:font/woff2;base64,d09GMgABAAAAACWwABIAAAABuCAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABqAAAABwAAAAcbGf0b2FCAACwAAAAFgAAABYAAAABY21hcAAAsAAAAA4AAAAOAA8ABGN2dCAAALEAAAAiAAAAIgP3AjRmcGdtAAABCAAAAFsAAABbZ4AQX2dhc3AAAGgAAAAIAAAACAAAABBnbHlmAAAU3AAAZ5kAAOqeSMM4cmhlYWQAAEBAAAAANgAAADYFFV7kaGhlYQAAQEgAAAAgAAAAJAzBBG9obXR4AABBGAAAAQAAAAD4mWAAnmxvY2EAAEkUAAAAeAAAANgUVCFqbWF4cAAAS9gAAAAgAAAAIAHvAJdubmFtZQAATBgAAAE5AAAB9FGyjs1wb3N0AABNiAAAAHoAAACC40f/13ByZXAAAUcEAAAAnQAAAMGg7x+LeJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2BkYWCcwMDKwMHUyXSGgYGhH0IzvmYwYuRgYGBiYGVmwAoC0lxTGBwYGJgBpR5BjP8H8jlAYQFZGA1GTAwAMusG9wB4nGNgZGBg4GIwYLBjYHJx8wlh4GBgYYAAkAxlDkB0lmY8BgABRRgBYnYGAAcYwAHAAAAAAAAAf//AAJ4nHWQy0oDMRBEb8PhUSoUxO+DQXwo8Qimth1V5HMBa2KnuhMuRzGJmV+bNo9N/rZ6x7FCKW3R3M1F/NRIRhV0pPdvXseMo4tzKq5rWBeeUXcfYUE6+jMsV1Yv81twgm8hx/9cI5jiB2b9DoekXeFluh9jsfkv2bsHV7lXW+MZ+4J3G5gB4nGNgQAYAAA4ABw==) format('woff2');
+  src: url(data:font/woff2;base64,d09GMgABAAAAAEl8ABIAAAAAmSgAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABqAAAABwAAAAcbGf0b2FCAACwAAAAFgAAABYAAAABY21hcAAAsAAAAA4AAAAOAA8ABGN2dCAAALEAAAAiAAAAIgP3AjRmcGdtAAABCAAAAFsAAABbZ4AQX2dhc3AAAGgAAAAIAAAACAAAABBnbHlmAAAU3AAAZ5kAAOqeSMM4cmhlYWQAAEBAAAAANgAAADYFFV7kaGhlYQAAQEgAAAAgAAAAJAzBBG9obXR4AABBGAAAAQAAAAD4mWAAnmxvY2EAAEkUAAAAeAAAANgUVCFqbWF4cAAAS9gAAAAgAAAAIAHvAJdubmFtZQAATBgAAAE5AAAB9FGyjs1wb3N0AABNiAAAAHoAAACC40f/13ByZXAAAUcEAAAAnQAAAMGg7x+LeJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2BkYWCcwMDKwMHUyXSGgYGhH0IzvmYwYuRgYGBiYGVmwAoC0lxTGBwYGJgBpR5BjP8H8jlAYQFZGA1GTAwAMusG9wB4nGNgZGBg4GIwYLBjYHJx8wlh4GBgYYAAkAxlDkB0lmY8BgABRRgBYnYGAAcYwAHAAAAAAAAAf//AAJ4nHWQy0oDMRBEb8PhUSoUxO+DQXwo8Qimth1V5HMBa2KnuhMuRzGJmV+bNo9N/rZ6x7FCKW3R3M1F/NRIRhV0pPdvXseMo4tzKq5rWBeeUXcfYUE6+jMsV1Yv81twgm8hx/9cI5jiB2b9DoekXeFluh9jsfkv2bsHV7lXW+MZ+4J3G5gB4nGNgQAYAAA4ABw==) format('woff2');
 }
 
 @font-face {
@@ -46,11 +46,17 @@ const POPPINS_CSS = `
   font-weight: 800;
   src: url(data:font/woff2;base64,d09GMgABAAAAACcEABIAAAAB+AgAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABqAAAABwAAAAcbGf0b2FCAACwAAAAFgAAABYAAAABY21hcAAAsAAAAA4AAAAOAA8ABGN2dCAAALEAAAAiAAAAIgP3AjRmcGdtAAABCAAAAFsAAABbZ4AQX2dhc3AAAGgAAAAIAAAACAAAABBnbHlmAAAWVAAAcpoAAOEivL3hN2hlYWQAAED4AAAANgAAADYFFV7kaGhlYQAAQRAAAAAgAAAAJAzBBG9obXR4AABBGAAAAQAAAAD4mWAAnmxvY2EAAEk4AAAAeAAAANgUVCFqbWF4cAAAS9gAAAAgAAAAIAHvAJdubmFtZQAATCAAAAE7AAAB+FG2mylwb3N0AABNiAAAAHoAAACC40f/13ByZXAAAUcEAAAAnQAAAMGg7x+LeJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2BkYWCcwMDKwMHUyXSGgYGhH0IzvmYwYuRgYGBiYGVmwAoC0lxTGBwYGJgBpR5BjP8H8jlAYQFZGA1GTAwAMusG9wB4nGNgZGBg4GIwYLBjYHJx8wlh4GBgYYAAkAxlDkB0lmY8BgABRRgBYnYGAAcYwAHAAAAAAAAAf//AAJ4nHWQy0oDMRBEb8PhUSoUxO+DQXwo8Qimth1V5HMBa2KnuhMuRzGJmV+bNo9N/rZ6x7FCKW3R3M1F/NRIRhV0pPdvXseMo4tzKq5rWBeeUXcfYUE6+jMsV1Yv81twgm8hx/9cI5jiB2b9DoekXeFluh9jsfkv2bsHV7lXW+MZ+4J3G5gB4nGNgQAYAAA4ABw==) format('woff2');
 }
+
+body, * {
+  font-family: 'Poppins', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 </style>
 `;
 
 /**
- * Inyecta las fuentes en el <head> y elimina links externos a Google Fonts
+ * Inyecta el CSS con las fuentes incrustadas en el <head> y elimina Google Fonts
  */
 function injectPoppinsFonts(html) {
   return html
@@ -58,11 +64,10 @@ function injectPoppinsFonts(html) {
     .replace(/<head>/i, `<head>${POPPINS_CSS}`);
 }
 
+// 🧠 Generar PDF
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
-  if (!html) {
-    return res.status(400).json({ error: "Falta el HTML" });
-  }
+  if (!html) return res.status(400).json({ error: "Falta el HTML" });
 
   let browser;
   try {
@@ -77,7 +82,7 @@ app.post("/api/pdf", async (req, res) => {
 
     const page = await browser.newPage();
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
-    await page.evaluateHandle("document.fonts.ready");
+    await page.evaluateHandle("document.fonts.ready"); // ✅ Esperar fuentes
 
     const pdfBuffer = await page.pdf({
       format: "A4",
