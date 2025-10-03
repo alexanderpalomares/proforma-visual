@@ -53,9 +53,10 @@ app.post("/api/pdf", async (req, res) => {
     });
     console.log("✅ PDF generado, tamaño:", pdfBuffer.length);
 
+    // ✅ MODIFICADO: cabeceras limpias y uso de res.end en lugar de res.send
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.send(pdfBuffer);
+    res.end(pdfBuffer); // ← importante: evita que Express meta charset=utf-8
 
   } catch (err) {
     console.error("🔥 Error generando PDF:", err.message);
