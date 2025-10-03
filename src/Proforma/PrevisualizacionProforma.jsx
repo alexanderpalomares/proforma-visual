@@ -50,15 +50,15 @@ const inlineImagesInNode = async (rootEl) => {
   );
 };
 
-// 🧠 Genera HTML autónomo (sin Google Fonts) para enviar al backend PDF
+// 🧠 Genera HTML autónomo (fuentes las inyecta el backend)
 const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   const head = `
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <style>
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      html, body { margin: 0; padding: 0; background: #fff; }
-      .pdf-page { width: 794px; margin: 0 auto; font-family: 'Poppins', Helvetica, Arial, sans-serif; }
+      html, body { margin: 0; padding: 0; background: #fff; font-family: 'Poppins', Helvetica, Arial, sans-serif; }
+      .pdf-page { width: 794px; margin: 0 auto; }
       @page { size: A4; margin: 20px; }
     </style>
   `;
