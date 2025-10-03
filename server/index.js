@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 const app = express();
 app.use(cors());
@@ -22,21 +23,16 @@ app.post("/api/pdf", async (req, res) => {
   try {
     console.log("📥 Recibida petición para generar PDF:", { filename, htmlLength: html.length });
 
-    // 🔍 Bloque de diagnóstico
-    try {
-      console.log("📂 Puppeteer executable path:", puppeteer.executablePath());
-    } catch (err) {
-      console.error("❌ puppeteer.executablePath() falló:", err.message);
-    }
-
     try {
       browser = await puppeteer.launch({
-        headless: true, // 👈 obligatorio en Render
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless, // 👈 Render requiere headless
       });
-      console.log("✅ Puppeteer logró lanzar Chromium");
+      console.log("✅ Puppeteer-Core logró lanzar Chromium");
     } catch (err) {
-      console.error("❌ Puppeteer NO logró lanzar Chromium:", err.message);
+      console.error("❌ Puppeteer-Core NO logró lanzar Chromium:", err.message);
       return res.status(500).json({ error: "Puppeteer no pudo lanzar Chromium", details: err.message });
     }
 
