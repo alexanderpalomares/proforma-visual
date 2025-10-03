@@ -16,17 +16,28 @@ app.get("/", (req, res) => {
 });
 
 //
-// 🧠 1. Detectar la carpeta de fuentes en Render
+// 🧠 1. Detectar carpeta de fuentes
 //
 const ROOT = process.cwd(); // Ej: /opt/render/project/src
 const CANDIDATE_A = path.join(ROOT, "server", "public", "fonts");
 const CANDIDATE_B = path.join(ROOT, "public", "fonts");
 const FONTS_DIR = fs.existsSync(CANDIDATE_A) ? CANDIDATE_A : CANDIDATE_B;
 
-const furl = (filename) => pathToFileURL(path.join(FONTS_DIR, filename)).href;
+if (!fs.existsSync(FONTS_DIR)) {
+  console.warn("⚠️ No se encontró carpeta de fuentes en:", FONTS_DIR);
+} else {
+  console.log("📂 Usando carpeta de fuentes:", FONTS_DIR);
+}
+
+const furl = (filename) => {
+  const fullPath = path.join(FONTS_DIR, filename);
+  const url = pathToFileURL(fullPath).href;
+  console.log(`📝 Fuente detectada: ${filename} -> ${url}`);
+  return url;
+};
 
 //
-// 🧠 2. Definir CSS con rutas absolutas file://
+// 🧠 2. CSS con rutas absolutas file://
 //
 const POPPINS_FILE_CSS = `
 <style>
@@ -64,7 +75,7 @@ html, body, * {
 `;
 
 //
-// 🧠 3. Inyectar CSS en el HTML entrante
+// 🧠 3. Inyección CSS en HTML entrante
 //
 function injectPoppinsFonts(html) {
   return html
@@ -73,7 +84,7 @@ function injectPoppinsFonts(html) {
 }
 
 //
-// 📄 4. Endpoint real de generación de PDFs
+// 📄 4. Generación de PDFs
 //
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
@@ -96,9 +107,10 @@ app.post("/api/pdf", async (req, res) => {
     await page.emulateMediaType("screen");
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
 
-    // 👇 Verificación de carga real de la fuente
-    const fontsReady = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
-    console.log("¿Poppins cargó en proforma? =>", fontsReady);
+    const fontsReady = await page.evaluate(() => {
+      return document.fonts.check('800 32px "Poppins"');
+    });
+    console.log("✅ ¿Poppins cargó en proforma? =>", fontsReady);
 
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -119,7 +131,7 @@ app.post("/api/pdf", async (req, res) => {
 });
 
 //
-// 🧪 5. Endpoint de diagnóstico /api/pdf/test
+// 🧪 5. Test de diagnóstico
 //
 app.get("/api/pdf/test", async (req, res) => {
   let browser;
@@ -163,11 +175,10 @@ app.get("/api/pdf/test", async (req, res) => {
 
     const page = await browser.newPage();
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
     await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
 
     const ok = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
-    console.log("¿Poppins cargó en test? =>", ok);
+    console.log("✅ ¿Poppins cargó en test? =>", ok);
 
     const pdfBuffer = await page.pdf({
       format: "A4",
