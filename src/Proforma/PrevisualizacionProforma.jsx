@@ -1,166 +1,126 @@
-import express from "express";
-import cors from "cors";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+// src/Proforma/PrevisualizacionProforma.jsx
+import React, { useState } from "react";
 
-const app = express();
-app.use(cors());
-app.use(express.json({ limit: "20mb" }));
+export default function PrevisualizacionProforma() {
+  const [loading, setLoading] = useState(false);
 
-// 🚀 Healthcheck
-app.get("/", (req, res) => {
-  res.send("Servidor de generación de PDF activo 🚀");
-});
+  const handleExportPDF = async () => {
+    setLoading(true);
+    try {
+      // 📌 Capturamos el HTML actual de la página (puedes afinarlo para solo capturar el contenedor de la proforma)
+      const html = document.documentElement.outerHTML;
 
-/**
- * 🎨 Fuentes Poppins incrustadas en Base64 (.woff2)
- * ⚠️ Aquí debes usar tus strings base64 reales de Poppins (400, 600, 700, 800)
- */
-const POPPINS_CSS = `
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 400;
-  src: url(data:font/woff2;base64,/* ... base64 400 ... */) format('woff2');
+      // 🌐 URL de tu backend en Render
+      const backendURL = "https://TU-BACKEND-RENDER.onrender.com/api/pdf"; // 👈 reemplaza con tu URL real
+
+      const response = await fetch(backendURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          html,
+          filename: "proforma.pdf",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo generar el PDF");
+      }
+
+      // 💾 Forzar la descarga del PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "proforma.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("❌ Error al exportar PDF:", err);
+      alert("Ocurrió un error al generar el PDF.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: "40px", fontFamily: "Poppins, sans-serif" }}>
+      <h1 style={{ fontWeight: 800, fontSize: "28px" }}>
+        Vista previa de la Proforma
+      </h1>
+      <p style={{ fontSize: "16px" }}>
+        Aquí puedes previsualizar cómo se verá la proforma antes de exportarla a PDF.
+      </p>
+
+      {/* 🧾 Contenido de ejemplo de la proforma */}
+      <table
+        style={{
+          width: "100%",
+          marginTop: "20px",
+          borderCollapse: "collapse",
+          fontSize: "14px",
+        }}
+      >
+        <thead>
+          <tr style={{ backgroundColor: "#f2f2f2" }}>
+            <th style={{ textAlign: "left", padding: "8px" }}>Producto</th>
+            <th style={{ textAlign: "right", padding: "8px" }}>Cantidad</th>
+            <th style={{ textAlign: "right", padding: "8px" }}>Precio</th>
+            <th style={{ textAlign: "right", padding: "8px" }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ padding: "8px" }}>Cemento Portland</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>10</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 25.00</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 250.00</td>
+          </tr>
+          <tr>
+            <td style={{ padding: "8px" }}>Varilla 1/2"</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>15</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 37.00</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 555.00</td>
+          </tr>
+          <tr>
+            <td style={{ padding: "8px" }}>Pintura Látex</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>5</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 85.00</td>
+            <td style={{ textAlign: "right", padding: "8px" }}>S/ 425.00</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style={{ fontWeight: 600 }}>
+            <td colSpan="3" style={{ textAlign: "right", padding: "8px" }}>
+              Total:
+            </td>
+            <td style={{ textAlign: "right", padding: "8px" }}>
+              S/ 1,230.00
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      {/* 🟡 Botón Exportar PDF */}
+      <button
+        onClick={handleExportPDF}
+        disabled={loading}
+        style={{
+          marginTop: "24px",
+          padding: "10px 20px",
+          backgroundColor: "#222",
+          color: "#fff",
+          border: "none",
+          cursor: "pointer",
+          fontSize: "16px",
+          borderRadius: "4px",
+        }}
+      >
+        {loading ? "Generando PDF..." : "Exportar PDF"}
+      </button>
+    </div>
+  );
 }
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  src: url(data:font/woff2;base64,/* ... base64 600 ... */) format('woff2');
-}
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  src: url(data:font/woff2;base64,/* ... base64 700 ... */) format('woff2');
-}
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 800;
-  src: url(data:font/woff2;base64,/* ... base64 800 ... */) format('woff2');
-}
-
-html, body, * {
-  font-family: 'Poppins', Helvetica, Arial, sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-`;
-
-/** ✅ Inyecta Poppins en <head> y limpia Google Fonts */
-function injectPoppinsFonts(html) {
-  return html
-    .replace(/<link[^>]+fonts\.googleapis[^>]*>/gi, "")
-    .replace(/<head>/i, `<head><style>${POPPINS_CSS}</style>`);
-}
-
-// 🧪 TEST ENDPOINT para diagnosticar fuentes
-app.get("/api/pdf/test", async (req, res) => {
-  let browser;
-  try {
-    const testHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8"/>
-          <title>Test Poppins</title>
-          <style>${POPPINS_CSS}</style>
-          <style>
-            body { padding: 40px; }
-            h1 { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 32px; }
-            p { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 16px; }
-          </style>
-        </head>
-        <body>
-          <h1>Hola con Poppins 800</h1>
-          <p>Si este texto aparece en Poppins, las fuentes están bien integradas ✅</p>
-        </body>
-      </html>
-    `;
-
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-
-    const page = await browser.newPage();
-    page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
-    await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
-
-    // 👇 Inyección forzada en runtime (diagnóstico)
-    await page.addStyleTag({ content: POPPINS_CSS });
-
-    // 👇 Verificación desde dentro de Chromium
-    const fontCheck = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
-    console.log("✅ Verificación forzada de Poppins en runtime =>", fontCheck);
-
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      preferCSSPageSize: true,
-    });
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="test-poppins.pdf"`);
-    res.end(pdfBuffer);
-  } catch (err) {
-    console.error("🔥 Error en /api/pdf/test:", err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    if (browser) await browser.close();
-  }
-});
-
-// 📄 Generación real de PDFs desde la app
-app.post("/api/pdf", async (req, res) => {
-  const { html, filename = "documento.pdf" } = req.body;
-  if (!html) return res.status(400).json({ error: "Falta el HTML" });
-
-  let browser;
-  try {
-    const processedHtml = injectPoppinsFonts(html);
-
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-
-    const page = await browser.newPage();
-    page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
-    await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
-
-    // 👇 Forzar inyección de fuentes en runtime
-    await page.addStyleTag({ content: POPPINS_CSS });
-
-    // 👇 Verificar en logs si la fuente se cargó realmente
-    const fontCheck = await page.evaluate(() => document.fonts.check('800 28px "Poppins"'));
-    console.log("¿Poppins cargó en proforma? =>", fontCheck);
-
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      preferCSSPageSize: true,
-      margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
-    });
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.end(pdfBuffer);
-  } catch (err) {
-    console.error("🔥 Error generando PDF:", err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    if (browser) await browser.close();
-  }
-});
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 PDF server listo en http://localhost:${PORT}`));
