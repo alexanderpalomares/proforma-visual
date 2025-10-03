@@ -14,24 +14,27 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
+// ✅ Versión optimizada: escala + compresión JPEG
 const toDataURL = (src) =>
   new Promise((resolve, reject) => {
-    try {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = reject;
-      img.src = src;
-    } catch (e) {
-      reject(e);
-    }
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const maxWidth = 600; // Ancho máximo permitido
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Convertir a JPEG comprimido (70%)
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      resolve(dataUrl);
+    };
+    img.onerror = reject;
+    img.src = src;
   });
 
 const inlineImagesInNode = async (rootEl) => {
