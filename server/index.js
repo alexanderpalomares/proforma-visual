@@ -16,18 +16,24 @@ app.get("/", (req, res) => {
 });
 
 //
-// 🧠 1. Detectar carpeta de fuentes
+// 🧠 1. Detectar carpeta de fuentes (prioriza /fonts en raíz)
 //
-const ROOT = process.cwd(); // Ej: /opt/render/project/src
-const CANDIDATE_A = path.join(ROOT, "server", "public", "fonts");
-const CANDIDATE_B = path.join(ROOT, "public", "fonts");
-const FONTS_DIR = fs.existsSync(CANDIDATE_A) ? CANDIDATE_A : CANDIDATE_B;
+const ROOT = process.cwd(); // /opt/render/project/src
 
-if (!fs.existsSync(FONTS_DIR)) {
-  console.warn("⚠️ No se encontró carpeta de fuentes en:", FONTS_DIR);
+const CANDIDATE_ROOT = path.join(ROOT, "fonts"); // ✅ prioridad
+const CANDIDATE_SERVER = path.join(ROOT, "server", "public", "fonts");
+const CANDIDATE_PUBLIC = path.join(ROOT, "public", "fonts");
+
+let FONTS_DIR = null;
+if (fs.existsSync(CANDIDATE_ROOT)) {
+  FONTS_DIR = CANDIDATE_ROOT;
+} else if (fs.existsSync(CANDIDATE_SERVER)) {
+  FONTS_DIR = CANDIDATE_SERVER;
 } else {
-  console.log("📂 Usando carpeta de fuentes:", FONTS_DIR);
+  FONTS_DIR = CANDIDATE_PUBLIC;
 }
+
+console.log("📂 Usando carpeta de fuentes:", FONTS_DIR);
 
 const furl = (filename) => {
   const fullPath = path.join(FONTS_DIR, filename);
@@ -84,7 +90,7 @@ function injectPoppinsFonts(html) {
 }
 
 //
-// 📄 4. Generación de PDFs
+// 📄 4. Generación de PDFs reales
 //
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
@@ -107,9 +113,8 @@ app.post("/api/pdf", async (req, res) => {
     await page.emulateMediaType("screen");
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
 
-    const fontsReady = await page.evaluate(() => {
-      return document.fonts.check('800 32px "Poppins"');
-    });
+    // ✅ Verificar carga real de la fuente
+    const fontsReady = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
     console.log("✅ ¿Poppins cargó en proforma? =>", fontsReady);
 
     const pdfBuffer = await page.pdf({
@@ -131,7 +136,7 @@ app.post("/api/pdf", async (req, res) => {
 });
 
 //
-// 🧪 5. Test de diagnóstico
+// 🧪 5. Endpoint de diagnóstico /api/pdf/test
 //
 app.get("/api/pdf/test", async (req, res) => {
   let browser;
