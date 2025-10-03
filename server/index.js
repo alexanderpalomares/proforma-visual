@@ -3,7 +3,6 @@ import cors from "cors";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 import path from "path";
-import { pathToFileURL } from "url";
 import fs from "fs";
 
 const app = express();
@@ -15,61 +14,46 @@ app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
 
-//
-// 🧠 1. Detectar carpeta de fuentes (prioriza /fonts en raíz)
-//
-const ROOT = process.cwd(); // /opt/render/project/src
+// 📂 Ubicación de fuentes en Base64
+const FONTS_DIR = path.join(process.cwd(), "server", "fonts");
 
-const CANDIDATE_ROOT = path.join(ROOT, "fonts"); // ✅ prioridad
-const CANDIDATE_SERVER = path.join(ROOT, "server", "public", "fonts");
-const CANDIDATE_PUBLIC = path.join(ROOT, "public", "fonts");
-
-let FONTS_DIR = null;
-if (fs.existsSync(CANDIDATE_ROOT)) {
-  FONTS_DIR = CANDIDATE_ROOT;
-} else if (fs.existsSync(CANDIDATE_SERVER)) {
-  FONTS_DIR = CANDIDATE_SERVER;
-} else {
-  FONTS_DIR = CANDIDATE_PUBLIC;
+function readBase64File(name) {
+  const filePath = path.join(FONTS_DIR, `${name}.b64.txt`);
+  return fs.readFileSync(filePath, "utf8");
 }
 
-console.log("📂 Usando carpeta de fuentes:", FONTS_DIR);
+// 📌 Cargamos las fuentes Base64 en variables
+const POPPINS_REGULAR_B64 = readBase64File("Poppins-Regular");
+const POPPINS_SEMIBOLD_B64 = readBase64File("Poppins-SemiBold");
+const POPPINS_BOLD_B64 = readBase64File("Poppins-Bold");
+const POPPINS_EXTRABOLD_B64 = readBase64File("Poppins-ExtraBold");
 
-const furl = (filename) => {
-  const fullPath = path.join(FONTS_DIR, filename);
-  const url = pathToFileURL(fullPath).href;
-  console.log(`📝 Fuente detectada: ${filename} -> ${url}`);
-  return url;
-};
-
-//
-// 🧠 2. CSS con rutas absolutas file://
-//
-const POPPINS_FILE_CSS = `
+// 🧠 CSS con las fuentes incrustadas en Base64
+const POPPINS_BASE64_CSS = `
 <style>
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
-  src: url('${furl("Poppins-Regular.ttf")}') format('truetype');
+  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_REGULAR_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 600;
-  src: url('${furl("Poppins-SemiBold.ttf")}') format('truetype');
+  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_SEMIBOLD_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url('${furl("Poppins-Bold.ttf")}') format('truetype');
+  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_BOLD_B64}) format('truetype');
 }
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 800;
-  src: url('${furl("Poppins-ExtraBold.ttf")}') format('truetype');
+  src: url(data:font/truetype;charset=utf-8;base64,${POPPINS_EXTRABOLD_B64}) format('truetype');
 }
 
 html, body, * {
@@ -80,18 +64,14 @@ html, body, * {
 </style>
 `;
 
-//
-// 🧠 3. Inyección CSS en HTML entrante
-//
+// 🧠 Inyectar CSS en HTML entrante
 function injectPoppinsFonts(html) {
   return html
     .replace(/<link[^>]+fonts\.googleapis[^>]*>/gi, "")
-    .replace(/<head>/i, `<head>${POPPINS_FILE_CSS}`);
+    .replace(/<head>/i, `<head>${POPPINS_BASE64_CSS}`);
 }
 
-//
-// 📄 4. Generación de PDFs reales
-//
+// 📄 Generación de PDFs
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "documento.pdf" } = req.body;
   if (!html) return res.status(400).json({ error: "Falta el HTML" });
@@ -110,10 +90,8 @@ app.post("/api/pdf", async (req, res) => {
     const page = await browser.newPage();
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-    await page.emulateMediaType("screen");
     await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
 
-    // ✅ Verificar carga real de la fuente
     const fontsReady = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
     console.log("✅ ¿Poppins cargó en proforma? =>", fontsReady);
 
@@ -135,9 +113,7 @@ app.post("/api/pdf", async (req, res) => {
   }
 });
 
-//
-// 🧪 5. Endpoint de diagnóstico /api/pdf/test
-//
+// 🧪 Test de fuentes
 app.get("/api/pdf/test", async (req, res) => {
   let browser;
   try {
@@ -147,7 +123,7 @@ app.get("/api/pdf/test", async (req, res) => {
         <head>
           <meta charset="utf-8"/>
           <title>Test Poppins</title>
-          ${POPPINS_FILE_CSS}
+          ${POPPINS_BASE64_CSS}
           <style>
             body {
               font-family: 'Poppins', sans-serif;
@@ -166,7 +142,7 @@ app.get("/api/pdf/test", async (req, res) => {
         </head>
         <body>
           <h1>Hola con Poppins 800</h1>
-          <p>Si este texto aparece en Poppins, las fuentes están bien integradas ✅</p>
+          <p>Si este texto aparece en Poppins, las fuentes están embebidas correctamente ✅</p>
         </body>
       </html>
     `;
@@ -180,8 +156,8 @@ app.get("/api/pdf/test", async (req, res) => {
 
     const page = await browser.newPage();
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-    await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
 
+    await page.setContent(testHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
     const ok = await page.evaluate(() => document.fonts.check('800 32px "Poppins"'));
     console.log("✅ ¿Poppins cargó en test? =>", ok);
 
@@ -202,8 +178,6 @@ app.get("/api/pdf/test", async (req, res) => {
   }
 });
 
-//
 // 🚀 Start server
-//
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 PDF server listo en http://localhost:${PORT}`));
