@@ -3,78 +3,89 @@ import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// 🧭 Necesario para rutas absolutas en ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-/* 🌐 Configuración CORS flexible */
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    const allowedOrigins = ["https://rapiproforma.vercel.app"];
-    const localhostRegex = /^http:\/\/localhost:\d+$/;
-    if (allowedOrigins.includes(origin) || localhostRegex.test(origin)) {
-      callback(null, true);
-    } else {
-      console.warn("❌ CORS bloqueado para origin:", origin);
-      callback(new Error("CORS no permitido"));
-    }
-  },
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true,
-};
+// 🌐 CORS: permite Vercel y localhost
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Permitir sin origin (por ejemplo, Postman)
+      if (!origin) return cb(null, true);
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+      const allowedOrigins = [
+        /^http:\/\/localhost:\d+$/,           // desarrollo local
+        /^https:\/\/.*\.vercel\.app$/,        // previews de Vercel
+        "https://rapiproforma.vercel.app"     // dominio de producción (ajústalo si usas otro)
+      ];
 
-app.use((req, res, next) => {
-  console.log("🌐 Petición desde origin:", req.headers.origin);
-  next();
-});
+      const isAllowed = allowedOrigins.some(rule =>
+        typeof rule === "string" ? rule === origin : rule.test(origin)
+      );
+
+      return isAllowed ? cb(null, true) : cb(new Error("CORS bloqueado: " + origin));
+    },
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"]
+  })
+);
 
 app.use(express.json({ limit: "20mb" }));
 
+// 📂 Servir archivos estáticos opcionalmente (ej: fuentes)
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🟢 Endpoint de salud
 app.get("/", (req, res) => {
-  res.send("Servidor de generación de PDF activo 🚀");
+  res.send("Servidor de PDF activo 🚀");
 });
 
+// 🧾 Endpoint principal para generar PDFs
 app.post("/api/pdf", async (req, res) => {
   try {
     const { html, filename = "documento.pdf" } = req.body;
-    if (!html) return res.status(400).json({ error: "Falta HTML" });
 
+    if (!html) {
+      return res.status(400).json({ error: "Falta el HTML" });
+    }
+
+    // 🧠 Lanzar Chromium en Render
     const browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
+      defaultViewport: { width: 1080, height: 1920 }
     });
 
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
+    // 📝 Generar el PDF
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
+      margin: { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" }
     });
 
     await browser.close();
 
-    console.log("📐 Tamaño del PDF generado:", pdfBuffer.length, "bytes");
-
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
-      "Content-Length": pdfBuffer.length,
-    });
-    res.send(pdfBuffer);
-  } catch (err) {
-    console.error("❌ Error al generar PDF:", err);
-    res.status(500).json({ error: "Error al generar PDF" });
+    // 📤 Enviar PDF como archivo descargable
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    console.error("❌ Error generando PDF:", error);
+    res.status(500).json({ error: "Error generando PDF" });
   }
 });
 
+// 🚀 Iniciar servidor
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor PDF escuchando en http://localhost:${PORT}`);
