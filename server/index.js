@@ -21,7 +21,7 @@ app.use(
   })
 );
 
-// 📝 (Opcional) Log para verificar el origin de cada request
+// 📝 Log para verificar el origin de cada request
 app.use((req, res, next) => {
   console.log("🌐 Petición desde origin:", req.headers.origin);
   next();
@@ -29,72 +29,13 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "20mb" }));
 
+// ✅ Sirve la carpeta public (para fuentes .ttf y assets)
+app.use(express.static(path.join(__dirname, "../public")));
+
 // 🚀 Healthcheck
 app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
-
-// 📂 Ubicación de fuentes en Base64
-const FONTS_DIR = path.join(process.cwd(), "server", "fonts");
-
-function readBase64File(name) {
-  try {
-    const filePath = path.join(FONTS_DIR, `${name}.b64.txt`);
-    return fs.readFileSync(filePath, "utf8");
-  } catch (e) {
-    console.error(`⚠️ No se pudo leer la fuente ${name}:`, e.message);
-    return "";
-  }
-}
-
-// 📌 Cargamos las fuentes Base64 en variables
-const POPPINS_REGULAR_B64 = readBase64File("Poppins-Regular");
-const POPPINS_SEMIBOLD_B64 = readBase64File("Poppins-SemiBold");
-const POPPINS_BOLD_B64 = readBase64File("Poppins-Bold");
-const POPPINS_EXTRABOLD_B64 = readBase64File("Poppins-ExtraBold");
-
-// 🧠 CSS con las fuentes incrustadas en Base64
-const POPPINS_BASE64_CSS = `
-<style>
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 400;
-  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_REGULAR_B64}) format('truetype');
-}
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_SEMIBOLD_B64}) format('truetype');
-}
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_BOLD_B64}) format('truetype');
-}
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 800;
-  src: url(data:application/x-font-ttf;charset=utf-8;base64,${POPPINS_EXTRABOLD_B64}) format('truetype');
-}
-
-html, body, * {
-  font-family: 'Poppins', Helvetica, Arial, sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-</style>
-`;
-
-// ✨ Inyectar fuentes en el HTML entrante
-function injectPoppinsFonts(html) {
-  return html
-    .replace(/<link[^>]+fonts\.googleapis[^>]*>/gi, "")
-    .replace(/<head>/i, `<head>${POPPINS_BASE64_CSS}`);
-}
 
 // 📄 Endpoint principal de generación de PDF
 app.post("/api/pdf", async (req, res) => {
@@ -103,8 +44,6 @@ app.post("/api/pdf", async (req, res) => {
 
   let browser;
   try {
-    const processedHtml = injectPoppinsFonts(html);
-
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
@@ -113,7 +52,13 @@ app.post("/api/pdf", async (req, res) => {
     });
 
     const page = await browser.newPage();
-    await page.setContent(processedHtml, { waitUntil: ["domcontentloaded", "networkidle0"] });
+
+    // 👇 Esta línea es CLAVE para que Puppeteer resuelva /fonts/ correctamente
+    await page.setContent(html, {
+      waitUntil: ["domcontentloaded", "networkidle0"],
+      baseURL: process.env.RENDER_EXTERNAL_URL || "http://localhost:4000",
+    });
+
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
