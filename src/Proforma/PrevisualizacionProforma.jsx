@@ -19,9 +19,9 @@ const formatMoney = (n) => PEN.format(Number(n) || 0);
 const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
 /**
- * 🧠 Convierte una imagen a Base64, redimensionándola y comprimiéndola
- * - maxWidth: ancho máximo permitido
- * - quality: compresión JPEG (0.8 = 80 %)
+ * 🧠 Convierte una imagen a Base64 optimizada.
+ * - Si detecta transparencia → usa PNG (mantiene transparencia).
+ * - Si no → usa JPEG comprimido para reducir peso.
  */
 const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
   new Promise((resolve, reject) => {
@@ -34,7 +34,25 @@ const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
       canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", quality));
+
+      // 🔍 Detectar transparencia en algunos píxeles
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      let hasTransparency = false;
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] < 255) {
+          hasTransparency = true;
+          break;
+        }
+      }
+
+      if (hasTransparency) {
+        // 👉 Exportar como PNG para conservar transparencia
+        resolve(canvas.toDataURL("image/png"));
+      } else {
+        // 👉 Exportar como JPEG comprimido para ahorrar espacio
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      }
     };
     img.onerror = reject;
     img.src = src;
@@ -68,7 +86,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
         })
       );
 
-      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas optimizadas
+      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas
       const rawHTML = container.innerHTML;
 
       const html = `
