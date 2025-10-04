@@ -1,96 +1,150 @@
-// server/index.js
-import express from "express";
-import cors from "cors";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+// src/Proforma/PrevisualizacionProforma.jsx
+import React, { useMemo, useRef, useState } from "react";
+import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-const app = express();
+import Header from "./Header";
+import ClienteInfo from "./ClienteInfo";
+import ProductoRow from "./ProductoRow";
+import Totales from "./Totales";
+import Footer from "./Footer";
 
-/* 🌐 Configuración CORS flexible:
-   - Permite cualquier localhost (cualquier puerto) para desarrollo con Vite
-   - Permite tu dominio de producción en Vercel
-   - Maneja preflight (OPTIONS) correctamente
-*/
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Permite peticiones sin Origin (Postman, SSR, etc.)
+const PEN = new Intl.NumberFormat("es-PE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-    const allowedOrigins = ["https://rapiproforma.vercel.app"];
-    const localhostRegex = /^http:\/\/localhost:\d+$/; // ✅ Acepta cualquier puerto local dinámico
+// ✅ Convierte imágenes a Base64 para que Puppeteer las pueda renderizar correctamente
+const toDataURL = (src) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const maxWidth = 600;
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 
-    if (allowedOrigins.includes(origin) || localhostRegex.test(origin)) {
-      callback(null, true);
-    } else {
-      console.warn("❌ CORS bloqueado para origin:", origin);
-      callback(new Error("CORS no permitido"));
+const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
+  const containerRef = useRef(null);
+  const [generando, setGenerando] = useState(false);
+
+  // 📌 URL del backend (Render) desde .env
+  const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
+
+  const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
+
+  const handleExportPDF = async () => {
+    try {
+      setGenerando(true);
+
+      // 🖼️ 1️⃣ Reemplazar todas las imágenes por Base64 antes de exportar
+      const imgs = containerRef.current.querySelectorAll("img");
+      await Promise.all(
+        Array.from(imgs).map(async (img) => {
+          const src = img.getAttribute("src");
+          if (src && !src.startsWith("data:")) {
+            try {
+              const dataUrl = await toDataURL(src);
+              img.setAttribute("src", dataUrl);
+            } catch (e) {
+              console.warn(`No se pudo convertir la imagen ${src} a Base64`, e);
+            }
+          }
+        })
+      );
+
+      // 🧱 2️⃣ Construir el HTML completo para Puppeteer
+      const rawHTML = containerRef.current.innerHTML;
+
+      const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            body {
+              font-family: sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              margin: 0;
+              padding: 0;
+            }
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          ${rawHTML}
+        </body>
+        </html>
+      `;
+
+      // 📄 3️⃣ Enviar HTML al servidor para generar PDF
+      const filename = `PROFORMA_${proformaNumber}.pdf`;
+
+      const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, filename }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al generar PDF: ${errorText}`);
+      }
+
+      // 📥 4️⃣ Descargar el PDF generado
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      // 🔢 5️⃣ Avanzar numeración local
+      getNextProformaNumber();
+    } catch (err) {
+      console.error("❌ Error en exportación PDF:", err);
+      alert("Error al generar el PDF. Revisa la consola para más detalles.");
+    } finally {
+      setGenerando(false);
     }
-  },
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true,
+  };
+
+  return (
+    <div className="p-4">
+      <div ref={containerRef} className="bg-white p-6 rounded-lg shadow">
+        <Header empresa={empresa} proformaNumber={proformaNumber} />
+        <ClienteInfo cliente={cliente} />
+        {productos.map((p, i) => (
+          <ProductoRow key={i} producto={p} formatMoney={formatMoney} />
+        ))}
+        <Totales productos={productos} formatMoney={formatMoney} />
+        <Footer />
+      </div>
+
+      <div className="mt-4 text-right">
+        <button
+          onClick={handleExportPDF}
+          disabled={generando}
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
+        >
+          {generando ? "Generando PDF..." : "Exportar PDF"}
+        </button>
+      </div>
+    </div>
+  );
 };
 
-// ✅ Habilitar CORS globalmente
-app.use(cors(corsOptions));
-// ✅ Manejar preflight OPTIONS correctamente
-app.options("*", cors(corsOptions));
-
-// 📝 Log de origen para debug
-app.use((req, res, next) => {
-  console.log("🌐 Petición desde origin:", req.headers.origin);
-  next();
-});
-
-// 🧠 Permitir enviar HTML grande para PDF
-app.use(express.json({ limit: "20mb" }));
-
-// 🚀 Endpoint de prueba
-app.get("/", (req, res) => {
-  res.send("Servidor de generación de PDF activo 🚀");
-});
-
-// 📝 Endpoint principal para generar PDF
-app.post("/api/pdf", async (req, res) => {
-  try {
-    const { html, filename = "documento.pdf" } = req.body;
-    if (!html) {
-      return res.status(400).json({ error: "Falta HTML" });
-    }
-
-    // 🧭 Lanzar navegador Puppeteer compatible con Render
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
-    });
-
-    await browser.close();
-
-    // 📎 Devolver PDF con headers adecuados
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
-      "Content-Length": pdfBuffer.length,
-    });
-    res.send(pdfBuffer);
-  } catch (err) {
-    console.error("❌ Error al generar PDF:", err);
-    res.status(500).json({ error: "Error al generar PDF" });
-  }
-});
-
-// 🟢 Render usa un puerto dinámico
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor PDF escuchando en http://localhost:${PORT}`);
-});
+export default PrevisualizacionProforma;
