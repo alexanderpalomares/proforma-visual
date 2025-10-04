@@ -50,16 +50,52 @@ const inlineImagesInNode = async (rootEl) => {
   );
 };
 
-// 🧠 Genera HTML autónomo (fuentes las inyecta el backend)
+// 🧠 Genera HTML autónomo con @font-face (fuentes desde /public/fonts)
 const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   const head = `
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <style>
+      @font-face {
+        font-family: 'Poppins';
+        src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Poppins';
+        src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Poppins';
+        src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Poppins';
+        src: url('/fonts/Poppins-ExtraBold.ttf') format('truetype');
+        font-weight: 800;
+        font-style: normal;
+      }
+
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      html, body { margin: 0; padding: 0; background: #fff; font-family: 'Poppins', Helvetica, Arial, sans-serif; }
-      .pdf-page { width: 794px; margin: 0 auto; }
-      @page { size: A4; margin: 20px; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        font-family: 'Poppins', Helvetica, Arial, sans-serif;
+      }
+      .pdf-page {
+        width: 794px;
+        margin: 0 auto;
+      }
+      @page {
+        size: A4;
+        margin: 20px;
+      }
     </style>
   `;
   const body = `<div class="pdf-page">${node.outerHTML}</div>`;
