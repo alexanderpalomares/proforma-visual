@@ -18,18 +18,23 @@ const formatMoney = (n) => PEN.format(Number(n) || 0);
 // 🌐 URL del backend (Render) desde .env
 const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
-// 🧠 Convierte una imagen en Base64 para incrustarla directamente
-const toDataURL = (src) =>
+/**
+ * 🧠 Convierte una imagen a Base64, redimensionándola y comprimiéndola
+ * - maxWidth: ancho máximo permitido
+ * - quality: compresión JPEG (0.8 = 80 %)
+ */
+const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
       const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/png"));
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
     };
     img.onerror = reject;
     img.src = src;
@@ -48,7 +53,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
       // 1️⃣ Referencia al contenedor actual
       const container = containerRef.current;
 
-      // 2️⃣ Convertir todas las imágenes a Base64 antes de capturar el HTML
+      // 2️⃣ Convertir todas las imágenes a Base64 optimizadas
       const imgTags = container.querySelectorAll("img");
       await Promise.all(
         Array.from(imgTags).map(async (img) => {
@@ -63,7 +68,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
         })
       );
 
-      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas
+      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas optimizadas
       const rawHTML = container.innerHTML;
 
       const html = `
@@ -81,6 +86,10 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
             }
             * {
               box-sizing: border-box;
+            }
+            img {
+              max-width: 100%;
+              height: auto;
             }
           </style>
         </head>
