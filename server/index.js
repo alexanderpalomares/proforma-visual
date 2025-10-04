@@ -37,6 +37,27 @@ app.get("/", (req, res) => {
   res.send("Servidor de generación de PDF activo 🚀");
 });
 
+// 🧪 Endpoint de diagnóstico para verificar rutas y archivos en Render
+app.get("/debug-paths", (req, res) => {
+  const publicPath = path.join(__dirname, "../public");
+  const fontsPath = path.join(publicPath, "fonts");
+  const regularFontPath = path.join(fontsPath, "Poppins-Regular.ttf");
+
+  res.json({
+    "__dirname": __dirname,
+    publicPath,
+    fontsPath,
+    regularFontPath,
+    publicExists: fs.existsSync(publicPath),
+    fontsExists: fs.existsSync(fontsPath),
+    regularFontExists: fs.existsSync(regularFontPath),
+    env: {
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL || null,
+      NODE_ENV: process.env.NODE_ENV || null,
+    },
+  });
+});
+
 // 📄 Endpoint principal de generación de PDF
 app.post("/api/pdf", async (req, res) => {
   const { html, filename = "proforma.pdf" } = req.body;
