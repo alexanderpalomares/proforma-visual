@@ -1,80 +1,132 @@
-const handleExportPDF = async () => {
-  try {
-    setGenerando(true);
+// src/Proforma/PrevisualizacionProforma.jsx
+import React, { useMemo, useRef, useState } from "react";
+import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
-    // 🖼️ 1️⃣ Reemplazar todas las imágenes por Base64
-    const imgs = containerRef.current.querySelectorAll("img");
+import Header from "./Header";
+import ClienteInfo from "./ClienteInfo";
+import ProductoRow from "./ProductoRow";
+import Totales from "./Totales";
+import Footer from "./Footer";
 
-    await Promise.all(
-      Array.from(imgs).map(async (img) => {
-        const src = img.getAttribute("src");
-        if (src && !src.startsWith("data:")) {
-          try {
-            const dataUrl = await toDataURL(src);
-            img.setAttribute("src", dataUrl);
-          } catch (e) {
-            console.warn(`No se pudo convertir la imagen ${src} a Base64`, e);
-          }
-        }
-      })
-    );
+const PEN = new Intl.NumberFormat("es-PE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-    // 🧱 2️⃣ Obtener el HTML limpio y estructurarlo correctamente
-    const rawHTML = containerRef.current.innerHTML;
+// ✅ Optimiza imágenes para incrustarlas como Base64 (para Puppeteer)
+const toDataURL = (src) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const maxWidth = 600;
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 
-    const html = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8" />
-        <style>
-          body {
-            font-family: sans-serif;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            margin: 0;
-            padding: 0;
-          }
-          * {
-            box-sizing: border-box;
-          }
-        </style>
-      </head>
-      <body>
-        ${rawHTML}
-      </body>
-      </html>
-    `;
+const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
+  const containerRef = useRef(null);
+  const [generando, setGenerando] = useState(false);
 
-    // 📝 3️⃣ Enviar el HTML al servidor PDF
-    const filename = `PROFORMA_${proformaNumber}.pdf`;
+  // 📌 URL del backend (Render) desde .env
+  const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
-    const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html, filename }),
-    });
+  const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al generar PDF: ${errorText}`);
+  const handleExportPDF = async () => {
+    try {
+      setGenerando(true);
+
+      // 🧱 Construir HTML completo para Puppeteer (sin fuentes embebidas)
+      const rawHTML = containerRef.current.innerHTML;
+
+      const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            body {
+              font-family: sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              margin: 0;
+              padding: 0;
+            }
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          ${rawHTML}
+        </body>
+        </html>
+      `;
+
+      const filename = `PROFORMA_${proformaNumber}.pdf`;
+
+      const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, filename }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al generar PDF: ${errorText}`);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      // 🔢 Avanzar numeración local
+      getNextProformaNumber();
+    } catch (err) {
+      console.error("❌ Error en exportación PDF:", err);
+      alert("Error al generar el PDF. Revisa la consola para más detalles.");
+    } finally {
+      setGenerando(false);
     }
+  };
 
-    // 📥 4️⃣ Descargar el PDF
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
+  return (
+    <div className="p-4">
+      <div ref={containerRef} className="bg-white p-6 rounded-lg shadow">
+        <Header empresa={empresa} proformaNumber={proformaNumber} />
+        <ClienteInfo cliente={cliente} />
+        {productos.map((p, i) => (
+          <ProductoRow key={i} producto={p} formatMoney={formatMoney} />
+        ))}
+        <Totales productos={productos} formatMoney={formatMoney} />
+        <Footer />
+      </div>
 
-    // 🔢 5️⃣ Avanzar numeración local
-    getNextProformaNumber();
-  } catch (err) {
-    console.error("❌ Error en exportación PDF:", err);
-    alert("Error al generar el PDF. Revisa la consola para más detalles.");
-  } finally {
-    setGenerando(false);
-  }
+      <div className="mt-4 text-right">
+        <button
+          onClick={handleExportPDF}
+          disabled={generando}
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
+        >
+          {generando ? "Generando PDF..." : "Exportar PDF"}
+        </button>
+      </div>
+    </div>
+  );
 };
+
+export default PrevisualizacionProforma;
