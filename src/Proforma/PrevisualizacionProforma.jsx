@@ -14,7 +14,7 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ✅ Convierte imágenes a Base64 para Puppeteer
+// ✅ Convierte imágenes a Base64 para Puppeteer (para evitar rutas locales rotas)
 const toDataURL = (src) =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -44,7 +44,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
     try {
       setGenerando(true);
 
-      // 🖼️ 1. Reemplazar imágenes por Base64
+      // 🖼️ 1. Convertir imágenes internas a Base64
       const imgs = containerRef.current.querySelectorAll("img");
       await Promise.all(
         Array.from(imgs).map(async (img) => {
@@ -59,35 +59,35 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
         })
       );
 
-      // 🧱 2. Construir HTML completo
+      // 🧱 2. Construir HTML limpio
       const rawHTML = containerRef.current.innerHTML;
       const html = `
         <!DOCTYPE html>
         <html lang="es">
-        <head>
-          <meta charset="UTF-8" />
-          <style>
-            @page { size: A4; margin: 0; }
-            body {
-              font-family: Arial, Helvetica, sans-serif;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-              margin: 0;
-              padding: 0;
-            }
-            * { box-sizing: border-box; }
-            img { max-width: 100%; height: auto; }
-          </style>
-        </head>
-        <body>
-          ${rawHTML}
-        </body>
+          <head>
+            <meta charset="UTF-8" />
+            <style>
+              @page { size: A4; margin: 0; }
+              body {
+                font-family: Arial, Helvetica, sans-serif;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+              }
+              * { box-sizing: border-box; }
+              img { max-width: 100%; height: auto; }
+            </style>
+          </head>
+          <body>
+            ${rawHTML}
+          </body>
         </html>
       `;
 
       const filename = `PROFORMA_${proformaNumber}.pdf`;
 
-      // 🌐 3. Enviar al backend
+      // 🌐 3. Llamada al servidor
       const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,20 +95,29 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error al generar PDF: ${errorText}`);
+        const text = await response.text();
+        throw new Error(`Error al generar PDF: ${text}`);
       }
 
-      // 💾 4. Descargar PDF generado
-      const blob = await response.blob();
+      // 🧠 4. Usar arrayBuffer para evitar corrupción
+      const arrayBuffer = await response.arrayBuffer();
+      console.log("📏 Tamaño del arrayBuffer recibido:", arrayBuffer.byteLength, "bytes");
+
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
+
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(url);
+      link.remove();
 
+      // 🔢 Avanzar numeración local
       getNextProformaNumber();
+
+      // ⏳ Revocar URL después de un pequeño delay
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
     } catch (err) {
       console.error("❌ Error en exportación PDF:", err);
       alert("Error al generar el PDF. Revisa la consola para más detalles.");
