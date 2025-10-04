@@ -8,6 +8,14 @@ import ProductoRow from "./ProductoRow";
 import Totales from "./Totales";
 import Footer from "./Footer";
 
+// ✅ Importamos las fuentes en Base64
+import {
+  POPPINS_REGULAR_BASE64,
+  POPPINS_SEMIBOLD_BASE64,
+  POPPINS_BOLD_BASE64,
+  POPPINS_EXTRABOLD_BASE64
+} from "../fonts/poppinsBase64";
+
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -50,7 +58,7 @@ const inlineImagesInNode = async (rootEl) => {
   );
 };
 
-// 🧠 Genera HTML autónomo con @font-face (fuentes desde /public/fonts)
+// 🧠 Genera HTML autónomo con fuentes incrustadas en Base64 (Render-friendly)
 const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
   const head = `
     <meta charset="utf-8"/>
@@ -58,25 +66,25 @@ const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
     <style>
       @font-face {
         font-family: 'Poppins';
-        src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+        src: url('${POPPINS_REGULAR_BASE64}') format('truetype');
         font-weight: 400;
         font-style: normal;
       }
       @font-face {
         font-family: 'Poppins';
-        src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+        src: url('${POPPINS_SEMIBOLD_BASE64}') format('truetype');
         font-weight: 600;
         font-style: normal;
       }
       @font-face {
         font-family: 'Poppins';
-        src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+        src: url('${POPPINS_BOLD_BASE64}') format('truetype');
         font-weight: 700;
         font-style: normal;
       }
       @font-face {
         font-family: 'Poppins';
-        src: url('/fonts/Poppins-ExtraBold.ttf') format('truetype');
+        src: url('${POPPINS_EXTRABOLD_BASE64}') format('truetype');
         font-weight: 800;
         font-style: normal;
       }
