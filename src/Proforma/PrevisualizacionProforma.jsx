@@ -1,3 +1,4 @@
+// src/Proforma/PrevisualizacionProforma.jsx
 import React, { useMemo, useRef, useState } from "react";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
@@ -13,7 +14,7 @@ const PEN = new Intl.NumberFormat("es-PE", {
 });
 const formatMoney = (n) => PEN.format(Number(n) || 0);
 
-// ✅ Convierte imágenes a Base64 para que Puppeteer pueda renderizarlas
+// ✅ Optimiza imágenes para incrustarlas como Base64 (para Puppeteer)
 const toDataURL = (src) =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -32,58 +33,38 @@ const toDataURL = (src) =>
     img.src = src;
   });
 
-// ✅ Carga el CSS de Tailwind desde CDN y lo devuelve como string
-const fetchTailwindCSS = async () => {
-  const res = await fetch("https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css");
-  return await res.text();
-};
-
 const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
   const containerRef = useRef(null);
   const [generando, setGenerando] = useState(false);
 
+  // 📌 URL del backend (Render) desde .env
   const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
+
   const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
 
   const handleExportPDF = async () => {
     try {
       setGenerando(true);
 
-      // 📝 Clonamos el contenedor para no alterar el DOM real
-      const containerClone = containerRef.current.cloneNode(true);
+      // 🧱 Construir HTML completo para Puppeteer (sin fuentes embebidas)
+      const rawHTML = containerRef.current.innerHTML;
 
-      // 🧠 Convertimos todas las imágenes a Base64
-      const imgs = containerClone.querySelectorAll("img");
-      for (const img of imgs) {
-        if (img.src.startsWith("http") || img.src.startsWith("blob:")) {
-          try {
-            const dataUrl = await toDataURL(img.src);
-            img.src = dataUrl;
-          } catch (err) {
-            console.warn("⚠️ No se pudo convertir imagen a Base64:", img.src, err);
-          }
-        }
-      }
-
-      // 🎨 Incrustamos Tailwind CSS
-      const tailwindCSS = await fetchTailwindCSS();
-
-      const rawHTML = containerClone.innerHTML;
       const html = `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <style>
-            ${tailwindCSS}
             body {
+              font-family: sans-serif;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
               margin: 0;
               padding: 0;
             }
-            * { box-sizing: border-box; }
+            * {
+              box-sizing: border-box;
+            }
           </style>
         </head>
         <body>
@@ -102,22 +83,11 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Error del servidor PDF:", errorText);
         throw new Error(`Error al generar PDF: ${errorText}`);
       }
 
-      // 📄 Verificamos si el backend devolvió HTML en vez de PDF (error silencioso)
       const blob = await response.blob();
-      const textCheck = await blob.text();
-      if (textCheck.startsWith("<!DOCTYPE html>") || textCheck.includes("<html")) {
-        console.error("⚠️ El servidor devolvió HTML en lugar de PDF:\n", textCheck);
-        alert("El servidor devolvió un error HTML en vez de un PDF. Revisa la consola.");
-        return;
-      }
-
-      // ✅ Descargamos el PDF real
-      const pdfBlob = new Blob([blob], { type: "application/pdf" });
-      const url = URL.createObjectURL(pdfBlob);
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
