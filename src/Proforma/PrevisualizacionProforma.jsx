@@ -8,14 +8,6 @@ import ProductoRow from "./ProductoRow";
 import Totales from "./Totales";
 import Footer from "./Footer";
 
-// ✅ Importamos las fuentes en Base64
-import {
-  POPPINS_REGULAR_BASE64,
-  POPPINS_SEMIBOLD_BASE64,
-  POPPINS_BOLD_BASE64,
-  POPPINS_EXTRABOLD_BASE64
-} from "../fonts/poppinsBase64";
-
 const PEN = new Intl.NumberFormat("es-PE", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -33,262 +25,108 @@ const toDataURL = (src) =>
       const canvas = document.createElement("canvas");
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
-
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-      resolve(dataUrl);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
     };
     img.onerror = reject;
     img.src = src;
   });
 
-const inlineImagesInNode = async (rootEl) => {
-  const imgs = rootEl.querySelectorAll("img");
-  await Promise.all(
-    Array.from(imgs).map(async (img) => {
-      const src = img.getAttribute("src");
-      if (!src) return;
-      try {
-        const dataUrl = await toDataURL(src);
-        img.setAttribute("src", dataUrl);
-      } catch (_) {}
-    })
-  );
-};
+const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
+  const containerRef = useRef(null);
+  const [generando, setGenerando] = useState(false);
 
-// 🧠 Genera HTML autónomo con fuentes incrustadas en Base64 (Render-friendly)
-const buildHTMLForPDF = (node, { title = "Documento" } = {}) => {
-  const head = `
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <style>
-      @font-face {
-        font-family: 'Poppins';
-        src: url('${POPPINS_REGULAR_BASE64}') format('truetype');
-        font-weight: 400;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Poppins';
-        src: url('${POPPINS_SEMIBOLD_BASE64}') format('truetype');
-        font-weight: 600;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Poppins';
-        src: url('${POPPINS_BOLD_BASE64}') format('truetype');
-        font-weight: 700;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Poppins';
-        src: url('${POPPINS_EXTRABOLD_BASE64}') format('truetype');
-        font-weight: 800;
-        font-style: normal;
-      }
+  // 📌 URL del backend (Render) desde .env
+  const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      html, body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        font-family: 'Poppins', Helvetica, Arial, sans-serif;
-      }
-      .pdf-page {
-        width: 794px;
-        margin: 0 auto;
-      }
-      @page {
-        size: A4;
-        margin: 20px;
-      }
-    </style>
-  `;
-  const body = `<div class="pdf-page">${node.outerHTML}</div>`;
-  return `<!doctype html><html><head><title>${title}</title>${head}</head><body>${body}</body></html>`;
-};
+  const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
 
-const styles = {
-  page: {
-    width: 794,
-    margin: "0 auto",
-    padding: 24,
-    backgroundColor: "#ffffff",
-    fontFamily: "Poppins, Helvetica, Arial, sans-serif",
-    color: "#000",
-  },
-  actions: {
-    display: "flex",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  btn: {
-    padding: "8px 16px",
-    borderRadius: 6,
-    color: "#fff",
-    fontWeight: 700,
-    cursor: "pointer",
-    border: "none",
-  },
-  btnGreen: { backgroundColor: "#16a34a" },
-  btnYellow: { backgroundColor: "#eab308", cursor: "wait" },
-  btnBlue: { backgroundColor: "#2563eb" },
-  btnRed: { backgroundColor: "#dc2626" },
-  btnGray: { backgroundColor: "#6b7280" },
-  overlaySuccess: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 9999,
-  },
-  successBox: {
-    backgroundColor: "#fff",
-    padding: "24px 32px",
-    borderRadius: 12,
-    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#16a34a",
-    fontFamily: "Poppins, sans-serif",
-  },
-};
-
-export default function PrevisualizacionProforma({
-  empresa = {},
-  cliente = {},
-  documento = {},
-  productos = [],
-  observaciones = "",
-  banco = {},
-  onVolver = () => {},
-}) {
-  const ref = useRef(null);
-  const [pdfStatus, setPdfStatus] = useState("idle");
-
-  const numeroPreview = useMemo(() => peekNextProformaNumber(), []);
-  const [numeroFinal, setNumeroFinal] = useState(null);
-
-  const total = useMemo(() => {
-    return productos.reduce((acc, p) => {
-      const precio = Number(p.precio) || 0;
-      const cantidad = Number(p.cantidad) || 0;
-      return acc + precio * cantidad;
-    }, 0);
-  }, [productos]);
-
-  const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || "http://localhost:4000";
-
-  const handleExportPdfPro = async () => {
+  const handleExportPDF = async () => {
     try {
-      setPdfStatus("loading");
-      const numero = getNextProformaNumber();
-      setNumeroFinal(numero);
+      setGenerando(true);
 
-      const original = ref.current;
-      const clone = original.cloneNode(true);
-      await inlineImagesInNode(clone);
+      // 🧱 Construir HTML completo para Puppeteer (sin fuentes embebidas)
+      const rawHTML = containerRef.current.innerHTML;
 
-      const html = buildHTMLForPDF(clone, { title: `${documento.tipo || "PROFORMA"} ${numero}` });
+      const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            body {
+              font-family: sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              margin: 0;
+              padding: 0;
+            }
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          ${rawHTML}
+        </body>
+        </html>
+      `;
 
-      const resp = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
+      const filename = `PROFORMA_${proformaNumber}.pdf`;
+
+      const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          html,
-          filename: `${documento.tipo || "PROFORMA"}_${numero}.pdf`,
-        }),
+        body: JSON.stringify({ html, filename }),
       });
 
-      if (!resp.ok) throw new Error("Fallo al generar PDF en el servidor");
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al generar PDF: ${errorText}`);
+      }
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${documento.tipo || "PROFORMA"}_${numero}.pdf`;
-      a.click();
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
       URL.revokeObjectURL(url);
 
-      setPdfStatus("success");
-      setTimeout(() => {
-        setPdfStatus("idle");
-        onVolver?.();
-      }, 2000);
+      // 🔢 Avanzar numeración local
+      getNextProformaNumber();
     } catch (err) {
-      console.error("Export server PDF error:", err);
-      setPdfStatus("error");
-      setTimeout(() => setPdfStatus("idle"), 3000);
+      console.error("❌ Error en exportación PDF:", err);
+      alert("Error al generar el PDF. Revisa la consola para más detalles.");
+    } finally {
+      setGenerando(false);
     }
   };
 
-  const exportBtnStyle =
-    pdfStatus === "idle"
-      ? { ...styles.btn, ...styles.btnGreen }
-      : pdfStatus === "loading"
-      ? { ...styles.btn, ...styles.btnYellow }
-      : pdfStatus === "success"
-      ? { ...styles.btn, ...styles.btnBlue }
-      : { ...styles.btn, ...styles.btnRed };
-
-  const numeroParaMostrar = numeroFinal ?? numeroPreview;
-
   return (
-    <div>
-      {pdfStatus === "success" && (
-        <div style={styles.overlaySuccess}>
-          <div style={styles.successBox}>✅ Documento generado con éxito</div>
-        </div>
-      )}
-
-      <div ref={ref} style={styles.page}>
-        <Header
-          empresa={empresa}
-          numero={numeroParaMostrar}
-          fecha={cliente.fecha}
-          tipoDocumento={documento.tipo || "PROFORMA"}
-        />
+    <div className="p-4">
+      <div ref={containerRef} className="bg-white p-6 rounded-lg shadow">
+        <Header empresa={empresa} proformaNumber={proformaNumber} />
         <ClienteInfo cliente={cliente} />
-        <div>
-          {productos.map((p, idx) => (
-            <ProductoRow key={idx} producto={p} idx={idx} formatMoney={formatMoney} />
-          ))}
-        </div>
-        <Totales total={total} formatMoney={formatMoney} />
-        <Footer empresa={empresa} observaciones={observaciones} banco={banco} />
+        {productos.map((p, i) => (
+          <ProductoRow key={i} producto={p} formatMoney={formatMoney} />
+        ))}
+        <Totales productos={productos} formatMoney={formatMoney} />
+        <Footer />
       </div>
 
-      <div className="print:hidden" style={styles.actions}>
+      <div className="mt-4 text-right">
         <button
-          type="button"
-          onClick={handleExportPdfPro}
-          disabled={pdfStatus === "loading"}
-          style={exportBtnStyle}
+          onClick={handleExportPDF}
+          disabled={generando}
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
         >
-          {pdfStatus === "idle" && "Descargar PDF profesional"}
-          {pdfStatus === "loading" && "Generando PDF..."}
-          {pdfStatus === "success" && "Documento listo ✅"}
-          {pdfStatus === "error" && "Error al generar PDF"}
-        </button>
-
-        <button
-          type="button"
-          onClick={onVolver}
-          style={{ ...styles.btn, ...styles.btnGray }}
-        >
-          Volver
+          {generando ? "Generando PDF..." : "Exportar PDF"}
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default PrevisualizacionProforma;
