@@ -18,6 +18,23 @@ const formatMoney = (n) => PEN.format(Number(n) || 0);
 // 🌐 URL del backend (Render) desde .env
 const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
+// 🧠 Convierte una imagen en Base64 para incrustarla directamente
+const toDataURL = (src) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+
 const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
   const containerRef = useRef(null);
   const [generando, setGenerando] = useState(false);
@@ -28,10 +45,27 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
     try {
       setGenerando(true);
 
-      // 1️⃣ Capturamos el HTML actual que se está mostrando
-      const rawHTML = containerRef.current.innerHTML;
+      // 1️⃣ Referencia al contenedor actual
+      const container = containerRef.current;
 
-      // 2️⃣ Lo envolvemos en HTML completo
+      // 2️⃣ Convertir todas las imágenes a Base64 antes de capturar el HTML
+      const imgTags = container.querySelectorAll("img");
+      await Promise.all(
+        Array.from(imgTags).map(async (img) => {
+          if (img.src && !img.src.startsWith("data:")) {
+            try {
+              const dataUrl = await toDataURL(img.src);
+              img.src = dataUrl;
+            } catch (err) {
+              console.warn("No se pudo convertir imagen:", img.src, err);
+            }
+          }
+        })
+      );
+
+      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas
+      const rawHTML = container.innerHTML;
+
       const html = `
         <!DOCTYPE html>
         <html lang="es">
@@ -45,7 +79,9 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
               margin: 0;
               padding: 0;
             }
-            * { box-sizing: border-box; }
+            * {
+              box-sizing: border-box;
+            }
           </style>
         </head>
         <body>
@@ -56,7 +92,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
 
       const filename = `PROFORMA_${proformaNumber}.pdf`;
 
-      // 3️⃣ Enviamos el HTML al backend Render
+      // 4️⃣ Enviamos el HTML al backend Render
       const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +101,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
 
       if (!response.ok) throw new Error("Error en la generación del PDF");
 
-      // 4️⃣ Recibimos el PDF y lo descargamos automáticamente
+      // 5️⃣ Descargamos el PDF
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -74,7 +110,6 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
       link.click();
       URL.revokeObjectURL(url);
 
-      // 🔢 Avanzamos el número de proforma
       getNextProformaNumber();
     } catch (err) {
       console.error("❌ Error en exportación PDF:", err);
