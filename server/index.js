@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
     status: "ok",
     message: "Servidor de generación de PDF activo 🚀",
     timestamp: new Date().toISOString(),
-    version: "2.0"
+    version: "2.1"
   });
 });
 
@@ -101,8 +101,9 @@ app.post("/api/pdf", async (req, res) => {
     });
     console.log("✅ HTML cargado");
 
-    // Esperar renderizado
-    await page.waitForTimeout(1500);
+    // ✅ USAR setTimeout EN LUGAR DE page.waitForTimeout
+    console.log("⏳ Esperando renderizado...");
+    await new Promise(resolve => setTimeout(resolve, 1500));
     console.log("✅ Renderizado completado");
 
     console.log("🖨️ Generando PDF...");
