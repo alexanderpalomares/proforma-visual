@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 export default function FormularioProductosMultiples({ data = [], onChange }) {
-  const [errorCampos, setErrorCampos] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const toNumber = (v) => {
@@ -68,7 +67,6 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
 
   return (
     <div className="space-y-4">
-      {/* 🟦 Línea superior + microtexto */}
       <div className="border-t pt-2">
         <p className="font-semibold text-sm">
           Agrega las imágenes de los productos que incluirás en la proforma.
@@ -96,16 +94,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
         </p>
       </div>
 
-      {/* 📝 Mensaje de formatos/tamaño permitido */}
       <p className="mt-1 text-xs text-gray-500">
         Formatos permitidos: PNG, JPG o JPEG — Tamaño máximo: 5 MB por imagen.
       </p>
-
-      {errorCampos && (
-        <p className="text-sm text-amber-600 mt-2">
-          Hay productos con datos incompletos. Revísalos antes de enviar al cliente.
-        </p>
-      )}
 
       {data.length > 0 && (
         <div className="space-y-4">
@@ -137,7 +128,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
                 </div>
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Nombre</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Nombre (obligatorio)
+                    </label>
                     <input
                       type="text"
                       value={p.nombre}
@@ -146,7 +139,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Descripción (opcional)
+                    </label>
                     <textarea
                       value={p.descripcion}
                       onChange={(e) => handleChange(p.id, "descripcion", e.target.value)}
@@ -156,7 +151,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Precio (S/)</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Precio (S/) (obligatorio)
+                    </label>
                     <input
                       type="number"
                       value={p.precio}
@@ -165,7 +162,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Cantidad</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Cantidad (obligatorio)
+                    </label>
                     <input
                       type="number"
                       value={p.cantidad}
@@ -174,7 +173,9 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Importe (S/)</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Importe (S/)
+                    </label>
                     <input
                       type="text"
                       value={toNumber(p.importe).toFixed(2)}

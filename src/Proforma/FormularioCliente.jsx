@@ -8,7 +8,7 @@ export default function FormularioCliente({ data = {}, onChange }) {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
 
-  // 📅 Si no hay fecha, la establecemos automáticamente al entrar
+  // 📅 Establece fecha actual por defecto al cargar el formulario
   useEffect(() => {
     if (!data.fecha) {
       const hoy = new Date().toISOString().slice(0, 10);
@@ -19,7 +19,6 @@ export default function FormularioCliente({ data = {}, onChange }) {
 
   return (
     <div>
-      {/* 🟦 Línea superior + texto guía debajo */}
       <div className="border-t pt-2 mb-4">
         <p className="font-semibold text-sm">
           Ingresa los datos del cliente que recibirá la proforma.
@@ -30,7 +29,7 @@ export default function FormularioCliente({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="nombre"
-          placeholder="Ramón Manrique"
+          placeholder="Nombre del cliente (obligatorio)"
           value={data.nombre || ""}
           onChange={handleInput}
         />
@@ -38,7 +37,7 @@ export default function FormularioCliente({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="ruc"
-          placeholder="46420566"
+          placeholder="DNI / RUC (opcional)"
           value={data.ruc || ""}
           onChange={handleInput}
         />
@@ -46,12 +45,11 @@ export default function FormularioCliente({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="direccion"
-          placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
+          placeholder="Dirección del cliente (obligatorio)"
           value={data.direccion || ""}
           onChange={handleInput}
         />
 
-        {/* 📅 Campo de fecha (automático + editable, sin label) */}
         <div>
           <input
             className={inputClass}

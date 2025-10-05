@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import FormularioEmpresa from "./FormularioEmpresa";
 import FormularioCliente from "./FormularioCliente";
@@ -16,7 +16,7 @@ const Wizard = () => {
     productos: [],
     observaciones: {},
   });
-  const [errorMessage, setErrorMessage] = useState(""); // ⚠️ Para mensajes de error visibles
+  const [errorMessage, setErrorMessage] = useState("");
 
   const steps = [
     "Empresa",
@@ -27,16 +27,36 @@ const Wizard = () => {
     "Previsualización",
   ];
 
+  // 🧭 1. Recuperar datos de empresa desde localStorage al iniciar
+  useEffect(() => {
+    const savedEmpresa = localStorage.getItem("empresa");
+    if (savedEmpresa) {
+      setFormData((prev) => ({
+        ...prev,
+        empresa: JSON.parse(savedEmpresa),
+      }));
+    }
+  }, []);
+
+  // 📝 2. Guardar empresa en localStorage cada vez que cambia
+  useEffect(() => {
+    if (formData.empresa && Object.keys(formData.empresa).length > 0) {
+      localStorage.setItem("empresa", JSON.stringify(formData.empresa));
+    }
+  }, [formData.empresa]);
+
   const handleDataChange = (step, data) => {
     setFormData((prev) => ({
       ...prev,
       [step]: data,
     }));
-    if (step === "empresa") setErrorMessage(""); // 🧼 Limpia error si usuario corrige
+    if (["empresa", "cliente", "productos"].includes(step)) {
+      setErrorMessage("");
+    }
   };
 
   const nextStep = () => {
-    // ✅ Validación en Paso 1
+    // ✅ Paso 1: Validación Empresa
     if (currentStep === 1) {
       const { nombre, direccion, telefono } = formData.empresa;
       const valid =
@@ -52,20 +72,62 @@ const Wizard = () => {
       }
     }
 
+    // ✅ Paso 2: Validación Cliente
+    if (currentStep === 2) {
+      const { nombre, direccion } = formData.cliente;
+      const valid =
+        nombre?.trim().length > 0 &&
+        direccion?.trim().length > 0;
+
+      if (!valid) {
+        setErrorMessage(
+          "⚠️ Por favor completa el nombre y la dirección del cliente antes de continuar."
+        );
+        return;
+      }
+    }
+
+    // ✅ Paso 4: Validación Productos
+    if (currentStep === 4) {
+      const productos = formData.productos;
+
+      if (!productos || productos.length === 0) {
+        setErrorMessage("⚠️ Agrega al menos un producto antes de continuar.");
+        return;
+      }
+
+      for (const [i, p] of productos.entries()) {
+        const nombreValido = p.nombre?.trim().length > 0;
+        const precioValido =
+          p.precio !== "" && p.precio !== null && p.precio !== undefined;
+        const cantidadValida =
+          p.cantidad !== "" && p.cantidad !== null && p.cantidad !== undefined;
+
+        if (!nombreValido || !precioValido || !cantidadValida) {
+          setErrorMessage(
+            `⚠️ Completa los campos obligatorios del producto #${i + 1} (Nombre, Precio y Cantidad).`
+          );
+          return;
+        }
+      }
+    }
+
     setErrorMessage("");
     setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
+  // 🧼 3. Al crear nueva proforma → no se borra la empresa
   const resetWizard = () => {
-    setFormData({
-      empresa: {},
+    setFormData((prev) => ({
+      ...prev,
       cliente: {},
       documento: {},
       productos: [],
       observaciones: {},
-    });
+      // empresa se conserva gracias a localStorage
+    }));
     setCurrentStep(1);
     setErrorMessage("");
   };
@@ -131,7 +193,9 @@ const Wizard = () => {
     <div style={styles.container}>
       {/* Barra de progreso */}
       <div style={styles.progressBarContainer}>
-        <div style={{ ...styles.progressBarFill, width: `${progressPercent}%` }} />
+        <div
+          style={{ ...styles.progressBarFill, width: `${progressPercent}%` }}
+        />
       </div>
 
       {/* Círculos de pasos */}
@@ -192,10 +256,8 @@ const Wizard = () => {
         )}
       </div>
 
-      {/* ⚠️ Mensaje de error visible */}
-      {errorMessage && (
-        <div style={styles.errorMessage}>{errorMessage}</div>
-      )}
+      {/* Mensaje de error global */}
+      {errorMessage && <div style={styles.errorMessage}>{errorMessage}</div>}
     </div>
   );
 };
