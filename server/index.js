@@ -6,76 +6,83 @@ import chromium from "@sparticuz/chromium";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// 🧭 Necesario para rutas absolutas en ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// 🌐 CORS: permite Vercel y localhost
+// 🌐 CORS
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Permitir sin origin (por ejemplo, Postman)
       if (!origin) return cb(null, true);
-
       const allowedOrigins = [
-        /^http:\/\/localhost:\d+$/,           // desarrollo local
-        /^https:\/\/.*\.vercel\.app$/,        // previews de Vercel
-        "https://rapiproforma.vercel.app"     // dominio de producción (ajústalo si usas otro)
+        /^http:\/\/localhost:\d+$/,
+        /^https:\/\/.*\.vercel\.app$/,
+        "https://rapiproforma.vercel.app",
       ];
-
-      const isAllowed = allowedOrigins.some(rule =>
+      const isAllowed = allowedOrigins.some((rule) =>
         typeof rule === "string" ? rule === origin : rule.test(origin)
       );
-
       return isAllowed ? cb(null, true) : cb(new Error("CORS bloqueado: " + origin));
     },
     methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"]
+    allowedHeaders: ["Content-Type"],
   })
 );
 
 app.use(express.json({ limit: "20mb" }));
-
-// 📂 Servir archivos estáticos opcionalmente (ej: fuentes)
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🟢 Endpoint de salud
 app.get("/", (req, res) => {
-  res.send("Servidor de PDF activo 🚀");
+  res.send("🚀 Servidor de PDF activo y optimizado");
 });
 
-// 🧾 Endpoint principal para generar PDFs
-app.post("/api/pdf", async (req, res) => {
-  try {
-    const { html, filename = "documento.pdf" } = req.body;
-
-    if (!html) {
-      return res.status(400).json({ error: "Falta el HTML" });
-    }
-
-    // 🧠 Lanzar Chromium en Render
-    const browser = await puppeteer.launch({
+// 🧠 Instancia única de Puppeteer (reutilizable)
+let browserPromise = null;
+async function getBrowser() {
+  if (!browserPromise) {
+    console.time("⏱ Puppeteer launch");
+    browserPromise = puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
-      defaultViewport: { width: 1080, height: 1920 }
+      defaultViewport: { width: 1080, height: 1920 },
     });
+    await browserPromise;
+    console.timeEnd("⏱ Puppeteer launch");
+  }
+  return browserPromise;
+}
 
+// 🧾 Endpoint de PDF
+app.post("/api/pdf", async (req, res) => {
+  const t0 = performance.now();
+
+  try {
+    const { html, filename = "documento.pdf" } = req.body;
+    if (!html) return res.status(400).json({ error: "Falta el HTML" });
+
+    const browser = await getBrowser();
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
 
-    // 📝 Generar el PDF
+    console.time("⏱ setContent");
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    console.timeEnd("⏱ setContent");
+
+    console.time("⏱ pdf");
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      margin: { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" }
+      margin: { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" },
     });
+    console.timeEnd("⏱ pdf");
 
-    await browser.close();
+    await page.close();
 
-    // 📤 Enviar PDF como archivo descargable
+    const t1 = performance.now();
+    console.log(`✅ PDF generado en ${(t1 - t0).toFixed(2)} ms`);
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(Buffer.from(pdfBuffer));
@@ -85,7 +92,6 @@ app.post("/api/pdf", async (req, res) => {
   }
 });
 
-// 🚀 Iniciar servidor
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor PDF escuchando en http://localhost:${PORT}`);
