@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function FormularioCliente({ data = {}, onChange }) {
   const inputClass =
@@ -7,6 +7,15 @@ export default function FormularioCliente({ data = {}, onChange }) {
   const handleInput = (e) => {
     onChange({ ...data, [e.target.name]: e.target.value });
   };
+
+  // 📅 Si no hay fecha, la establecemos automáticamente al entrar
+  useEffect(() => {
+    if (!data.fecha) {
+      const hoy = new Date().toISOString().slice(0, 10);
+      onChange({ ...data, fecha: hoy });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
@@ -25,6 +34,7 @@ export default function FormularioCliente({ data = {}, onChange }) {
           value={data.nombre || ""}
           onChange={handleInput}
         />
+
         <input
           className={inputClass}
           name="ruc"
@@ -32,6 +42,7 @@ export default function FormularioCliente({ data = {}, onChange }) {
           value={data.ruc || ""}
           onChange={handleInput}
         />
+
         <input
           className={inputClass}
           name="direccion"
@@ -39,13 +50,20 @@ export default function FormularioCliente({ data = {}, onChange }) {
           value={data.direccion || ""}
           onChange={handleInput}
         />
-        <input
-          className={inputClass}
-          type="date"
-          name="fecha"
-          value={data.fecha || ""}
-          onChange={handleInput}
-        />
+
+        {/* 📅 Campo de fecha (automático + editable, sin label) */}
+        <div>
+          <input
+            className={inputClass}
+            type="date"
+            name="fecha"
+            value={data.fecha || ""}
+            onChange={handleInput}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Puedes modificar la fecha si es necesario.
+          </p>
+        </div>
       </div>
     </div>
   );

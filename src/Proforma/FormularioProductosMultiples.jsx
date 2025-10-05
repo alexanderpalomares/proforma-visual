@@ -86,7 +86,7 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
       >
         <input
           type="file"
-          accept="image/*"
+          accept=".png,.jpg,.jpeg"
           multiple
           onChange={handleImagenes}
           className="absolute inset-0 opacity-0 cursor-pointer"
@@ -95,6 +95,11 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
           {isDragging ? "Suelta las imágenes aquí" : "Haz clic o arrastra tus imágenes aquí"}
         </p>
       </div>
+
+      {/* 📝 Mensaje de formatos/tamaño permitido */}
+      <p className="mt-1 text-xs text-gray-500">
+        Formatos permitidos: PNG, JPG o JPEG — Tamaño máximo: 5 MB por imagen.
+      </p>
 
       {errorCampos && (
         <p className="text-sm text-amber-600 mt-2">

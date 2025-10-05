@@ -17,31 +17,30 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       gap: 12,
     },
     logoBox: {
-      width: 70, // 🔑 ancho fijo
-      height: 70, // 🔑 alto fijo
+      width: 70,
+      height: 70,
       borderRadius: 10,
-     
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       overflow: "hidden",
-      flexShrink: 0, // evita que se deforme si el contenedor se hace chico
+      flexShrink: 0,
     },
     logo: {
       width: "100%",
       height: "100%",
-      objectFit: "contain", // mantiene proporción del logo
+      objectFit: "contain",
     },
     textGroup: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      lineHeight: 1,
+      lineHeight: 1.2,
     },
     empresaNombre: {
       fontWeight: 700,
       fontSize: 14,
-      marginBottom: 1,
+      marginBottom: 2,
     },
     empresaDato: {
       fontSize: 11,
@@ -73,25 +72,31 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
     <div style={styles.container}>
       {/* Bloque empresa */}
       <div style={styles.empresaBlock}>
-        <div style={styles.logoBox}>
-          {empresa?.logo ? (
+        {empresa?.logo && (
+          <div style={styles.logoBox}>
             <img src={empresa.logo} alt="Logo" style={styles.logo} />
-          ) : (
-            <span style={{ fontSize: 10, color: "#999" }}>Logo</span>
-          )}
-        </div>
+          </div>
+        )}
 
         <div style={styles.textGroup}>
-          <div style={styles.empresaNombre}>
-            {empresa?.nombre || "Nombre de la empresa"}
-          </div>
-          <div style={styles.empresaDato}>{empresa?.ruc || "---"}</div>
-          <div style={styles.empresaDato}>
-            {empresa?.direccion || "Dirección no registrada"}
-          </div>
-          <div style={styles.empresaDato}>{empresa?.telefono || "—"}</div>
-          <div style={styles.empresaDato}>{empresa?.correo || "—"}</div>
-          <div style={styles.empresaDato}>{empresa?.web || "—"}</div>
+          {empresa?.nombre && (
+            <div style={styles.empresaNombre}>{empresa.nombre}</div>
+          )}
+          {empresa?.ruc && (
+            <div style={styles.empresaDato}>{empresa.ruc}</div>
+          )}
+          {empresa?.direccion && (
+            <div style={styles.empresaDato}>{empresa.direccion}</div>
+          )}
+          {empresa?.telefono && (
+            <div style={styles.empresaDato}>{empresa.telefono}</div>
+          )}
+          {empresa?.correo && (
+            <div style={styles.empresaDato}>{empresa.correo}</div>
+          )}
+          {empresa?.web && (
+            <div style={styles.empresaDato}>{empresa.web}</div>
+          )}
         </div>
       </div>
 

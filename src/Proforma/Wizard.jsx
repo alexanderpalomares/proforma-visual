@@ -1,4 +1,3 @@
-// src/Proforma/Wizard.jsx
 import React, { useState } from "react";
 
 import FormularioEmpresa from "./FormularioEmpresa";
@@ -10,7 +9,6 @@ import PrevisualizacionProforma from "./PrevisualizacionProforma";
 
 const Wizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
-
   const [formData, setFormData] = useState({
     empresa: {},
     cliente: {},
@@ -18,6 +16,7 @@ const Wizard = () => {
     productos: [],
     observaciones: {},
   });
+  const [errorMessage, setErrorMessage] = useState(""); // ⚠️ Para mensajes de error visibles
 
   const steps = [
     "Empresa",
@@ -33,10 +32,43 @@ const Wizard = () => {
       ...prev,
       [step]: data,
     }));
+    if (step === "empresa") setErrorMessage(""); // 🧼 Limpia error si usuario corrige
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  const nextStep = () => {
+    // ✅ Validación en Paso 1
+    if (currentStep === 1) {
+      const { nombre, direccion, telefono } = formData.empresa;
+      const valid =
+        nombre?.trim().length > 0 &&
+        direccion?.trim().length > 0 &&
+        telefono?.trim().length > 0;
+
+      if (!valid) {
+        setErrorMessage(
+          "⚠️ Por favor completa la razón social, dirección y teléfono antes de continuar."
+        );
+        return;
+      }
+    }
+
+    setErrorMessage("");
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
+
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+
+  const resetWizard = () => {
+    setFormData({
+      empresa: {},
+      cliente: {},
+      documento: {},
+      productos: [],
+      observaciones: {},
+    });
+    setCurrentStep(1);
+    setErrorMessage("");
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -85,6 +117,7 @@ const Wizard = () => {
             observaciones={formData.observaciones.observaciones || ""}
             banco={formData.observaciones}
             onVolver={prevStep}
+            onResetWizard={resetWizard}
           />
         );
       default:
@@ -96,12 +129,12 @@ const Wizard = () => {
 
   return (
     <div style={styles.container}>
-      {/* Barra lineal */}
+      {/* Barra de progreso */}
       <div style={styles.progressBarContainer}>
         <div style={{ ...styles.progressBarFill, width: `${progressPercent}%` }} />
       </div>
 
-      {/* Círculos con check */}
+      {/* Círculos de pasos */}
       <div style={styles.progressWrap}>
         {steps.map((label, idx) => {
           const stepNumber = idx + 1;
@@ -119,7 +152,6 @@ const Wizard = () => {
                     ? "#2563eb"
                     : "#e5e7eb",
                   color: isCompleted || isActive ? "#fff" : "#6b7280",
-                  transition: "all 0.3s ease",
                 }}
               >
                 {isCompleted ? "✔" : stepNumber}
@@ -148,7 +180,7 @@ const Wizard = () => {
 
       {/* Navegación */}
       <div style={styles.buttons}>
-        {currentStep > 1 && (
+        {currentStep > 1 && currentStep < steps.length && (
           <button style={styles.btn} onClick={prevStep}>
             Atrás
           </button>
@@ -159,6 +191,11 @@ const Wizard = () => {
           </button>
         )}
       </div>
+
+      {/* ⚠️ Mensaje de error visible */}
+      {errorMessage && (
+        <div style={styles.errorMessage}>{errorMessage}</div>
+      )}
     </div>
   );
 };
@@ -215,6 +252,7 @@ const styles = {
   buttons: {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   btn: {
     padding: "10px 20px",
@@ -223,6 +261,13 @@ const styles = {
     background: "#2563eb",
     color: "#fff",
     cursor: "pointer",
+    fontWeight: 500,
+  },
+  errorMessage: {
+    marginTop: "10px",
+    color: "#dc2626",
+    fontSize: "14px",
+    fontWeight: 500,
   },
 };
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
 import Header from "./Header";
@@ -19,8 +19,6 @@ const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL;
 
 /**
  * 🧠 Convierte una imagen a Base64 optimizada.
- * - Si detecta transparencia → usa PNG (mantiene transparencia).
- * - Si no → usa JPEG comprimido para reducir peso.
  */
 const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
   new Promise((resolve, reject) => {
@@ -34,7 +32,6 @@ const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // 🔍 Detectar transparencia en algunos píxeles
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const pixels = imageData.data;
       let hasTransparency = false;
@@ -62,20 +59,31 @@ const PrevisualizacionProforma = ({
   tipoDocumento,
   observaciones = "",
   banco = {},
+  onVolver,       // 👈 Para retroceder un paso (al paso 5)
+  onResetWizard,  // 👈 Para reiniciar el wizard tras exportar
 }) => {
   const containerRef = useRef(null);
   const [generando, setGenerando] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
 
-  // 📤 Función para exportar la proforma como PDF
+  // 🔔 Oculta el toast automáticamente después de unos segundos
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
+  // 📤 Exportar PDF
   const handleExportPDF = async () => {
     try {
       setGenerando(true);
 
-      // 1️⃣ Referencia al contenedor actual
       const container = containerRef.current;
 
-      // 2️⃣ Convertir todas las imágenes a Base64 optimizadas
+      // Convertir imágenes a Base64
       const imgTags = container.querySelectorAll("img");
       await Promise.all(
         Array.from(imgTags).map(async (img) => {
@@ -90,10 +98,9 @@ const PrevisualizacionProforma = ({
         })
       );
 
-      // 3️⃣ Capturamos el HTML limpio con imágenes embebidas
       const rawHTML = container.innerHTML;
 
-      // ✅ Aquí incluimos Montserrat en el HTML para Puppeteer
+      // HTML completo para Puppeteer
       const html = `
         <!DOCTYPE html>
         <html lang="es">
@@ -101,7 +108,6 @@ const PrevisualizacionProforma = ({
           <meta charset="UTF-8" />
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
-
             body {
               font-family: sans-serif;
               -webkit-print-color-adjust: exact;
@@ -109,21 +115,13 @@ const PrevisualizacionProforma = ({
               margin: 0;
               padding: 0;
             }
-
             h1, h2, h3, .doc-title {
               font-family: 'Montserrat', sans-serif;
               font-weight: 800;
               text-transform: uppercase;
             }
-
-            * {
-              box-sizing: border-box;
-            }
-
-            img {
-              max-width: 100%;
-              height: auto;
-            }
+            * { box-sizing: border-box; }
+            img { max-width: 100%; height: auto; }
           </style>
         </head>
         <body>
@@ -134,7 +132,6 @@ const PrevisualizacionProforma = ({
 
       const filename = `PROFORMA_${proformaNumber}.pdf`;
 
-      // 4️⃣ Enviamos el HTML al backend Render
       const response = await fetch(`${PDF_SERVER_URL}/api/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -143,7 +140,6 @@ const PrevisualizacionProforma = ({
 
       if (!response.ok) throw new Error("Error en la generación del PDF");
 
-      // 5️⃣ Descargamos el PDF
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -153,6 +149,8 @@ const PrevisualizacionProforma = ({
       URL.revokeObjectURL(url);
 
       getNextProformaNumber();
+      setExportSuccess(true);
+      setShowToast(true);
     } catch (err) {
       console.error("❌ Error en exportación PDF:", err);
       alert("Ocurrió un error al generar el PDF. Revisa la consola.");
@@ -189,16 +187,66 @@ const PrevisualizacionProforma = ({
         <Footer empresa={empresa} observaciones={observaciones} banco={banco} />
       </div>
 
-      {/* 📌 Botón de exportación */}
-      <div className="mt-4 text-right">
-        <button
-          onClick={handleExportPDF}
-          disabled={generando}
-          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
-        >
-          {generando ? "Generando PDF..." : "Exportar PDF"}
-        </button>
+      {/* 📌 Acciones */}
+      <div className="mt-4 flex justify-end gap-3">
+        {!exportSuccess ? (
+          <>
+            <button
+              onClick={onVolver}
+              className="flex items-center justify-center gap-2 min-w-[120px] bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <span className="text-lg">←</span>
+              <span>Volver</span>
+            </button>
+
+            <button
+              onClick={handleExportPDF}
+              disabled={generando}
+              className="min-w-[120px] bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 disabled:opacity-50 transition-colors font-medium"
+            >
+              {generando ? "Generando..." : "Exportar PDF"}
+            </button>
+          </>
+        ) : (
+          <div className="w-full text-center">
+            <p className="text-green-600 font-semibold mb-2">
+              ✅ Proforma exportada correctamente
+            </p>
+            <button
+              onClick={onResetWizard}
+              className="min-w-[120px] bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Crear nueva proforma
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* 🌟 Toast flotante */}
+      {showToast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "#16a34a",
+            color: "white",
+            padding: "12px 18px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            fontWeight: "600",
+            fontSize: "14px",
+            opacity: showToast ? 1 : 0,
+            transform: showToast
+              ? "translateY(0) scale(1)"
+              : "translateY(20px) scale(0.95)",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            zIndex: 9999,
+          }}
+        >
+          ✅ Proforma exportada correctamente
+        </div>
+      )}
     </div>
   );
 };

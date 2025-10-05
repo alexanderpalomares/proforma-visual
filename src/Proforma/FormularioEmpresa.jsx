@@ -25,7 +25,6 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
 
   return (
     <div>
-      {/* 🟦 Línea superior + texto guía debajo */}
       <div className="border-t pt-2 mb-4">
         <p className="font-semibold text-sm">
           Completa la información de tu empresa que aparecerá en la proforma.
@@ -36,14 +35,14 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="nombre"
-          placeholder="Ferretería Kike"
+          placeholder="Razón social (obligatorio)"
           value={data.nombre || ""}
           onChange={handleInput}
         />
         <input
           className={inputClass}
           name="ruc"
-          placeholder="20601648391"
+          placeholder="RUC (opcional)"
           value={data.ruc || ""}
           onChange={(e) =>
             onChange({
@@ -55,14 +54,14 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="direccion"
-          placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
+          placeholder="Dirección (obligatorio)"
           value={data.direccion || ""}
           onChange={handleInput}
         />
         <input
           className={inputClass}
           name="telefono"
-          placeholder="987916570"
+          placeholder="Teléfono (obligatorio)"
           value={data.telefono || ""}
           onChange={(e) =>
             onChange({
@@ -74,19 +73,18 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
         <input
           className={inputClass}
           name="correo"
-          placeholder="ferreteriakike@gmail.com"
+          placeholder="Correo (opcional)"
           value={data.correo || ""}
           onChange={handleInput}
         />
         <input
           className={inputClass}
           name="web"
-          placeholder="www.ferreteriakike.com"
+          placeholder="Web (opcional)"
           value={data.web || ""}
           onChange={handleInput}
         />
 
-        {/* Logo */}
         <div className="md:col-span-2">
           <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
             <input
@@ -96,7 +94,6 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
               className="absolute inset-0 opacity-0 cursor-pointer z-0"
               onChange={onLogoFile}
             />
-
             {data.logo ? (
               <>
                 <img
@@ -119,7 +116,7 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
               </>
             ) : (
               <span className="text-gray-400 text-xs text-center px-2 z-10 pointer-events-none">
-                Selecciona tu logo
+                Selecciona tu logo (opcional)
               </span>
             )}
           </div>
