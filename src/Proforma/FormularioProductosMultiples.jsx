@@ -68,6 +68,13 @@ export default function FormularioProductosMultiples({ data = [], onChange }) {
 
   return (
     <div className="space-y-4">
+      {/* 🟦 Línea superior + microtexto */}
+      <div className="border-t pt-2">
+        <p className="font-semibold text-sm">
+          Agrega las imágenes de los productos que incluirás en la proforma.
+        </p>
+      </div>
+
       {/* Dropzone */}
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer relative transition ${

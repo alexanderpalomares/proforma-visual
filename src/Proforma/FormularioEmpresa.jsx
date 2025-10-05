@@ -24,93 +24,105 @@ export default function FormularioEmpresa({ data = {}, onChange }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input
-        className={inputClass}
-        name="nombre"
-        placeholder="Ferretería Kike"
-        value={data.nombre || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        name="ruc"
-        placeholder="20601648391"
-        value={data.ruc || ""}
-        onChange={(e) =>
-          onChange({ ...data, ruc: e.target.value.replace(/\D/g, "").slice(0, 11) })
-        }
-      />
-      <input
-        className={inputClass}
-        name="direccion"
-        placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
-        value={data.direccion || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        name="telefono"
-        placeholder="987916570"
-        value={data.telefono || ""}
-        onChange={(e) =>
-          onChange({
-            ...data,
-            telefono: e.target.value.replace(/[^\d+]/g, ""),
-          })
-        }
-      />
-      <input
-        className={inputClass}
-        name="correo"
-        placeholder="ferreteriakike@gmail.com"
-        value={data.correo || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        name="web"
-        placeholder="www.ferreteriakike.com"
-        value={data.web || ""}
-        onChange={handleInput}
-      />
+    <div>
+      {/* 🟦 Línea superior + texto guía debajo */}
+      <div className="border-t pt-2 mb-4">
+        <p className="font-semibold text-sm">
+          Completa la información de tu empresa que aparecerá en la proforma.
+        </p>
+      </div>
 
-      {/* Subida de logo */}
-      <div className="md:col-span-2">
-        <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 opacity-0 cursor-pointer z-0"
-            onChange={onLogoFile}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          className={inputClass}
+          name="nombre"
+          placeholder="Ferretería Kike"
+          value={data.nombre || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          name="ruc"
+          placeholder="20601648391"
+          value={data.ruc || ""}
+          onChange={(e) =>
+            onChange({
+              ...data,
+              ruc: e.target.value.replace(/\D/g, "").slice(0, 11),
+            })
+          }
+        />
+        <input
+          className={inputClass}
+          name="direccion"
+          placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
+          value={data.direccion || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          name="telefono"
+          placeholder="987916570"
+          value={data.telefono || ""}
+          onChange={(e) =>
+            onChange({
+              ...data,
+              telefono: e.target.value.replace(/[^\d+]/g, ""),
+            })
+          }
+        />
+        <input
+          className={inputClass}
+          name="correo"
+          placeholder="ferreteriakike@gmail.com"
+          value={data.correo || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          name="web"
+          placeholder="www.ferreteriakike.com"
+          value={data.web || ""}
+          onChange={handleInput}
+        />
 
-          {data.logo ? (
-            <>
-              <img
-                src={data.logo}
-                alt="Logo"
-                className="w-full h-full object-contain z-10 pointer-events-none"
-              />
-              <button
-                type="button"
-                aria-label="Quitar logo"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  limpiarLogo();
-                }}
-                className="absolute top-1 right-1 z-20 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
-              >
-                ✕
-              </button>
-            </>
-          ) : (
-            <span className="text-gray-400 text-xs text-center px-2 z-10 pointer-events-none">
-              Selecciona tu logo
-            </span>
-          )}
+        {/* Logo */}
+        <div className="md:col-span-2">
+          <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer z-0"
+              onChange={onLogoFile}
+            />
+
+            {data.logo ? (
+              <>
+                <img
+                  src={data.logo}
+                  alt="Logo"
+                  className="w-full h-full object-contain z-10 pointer-events-none"
+                />
+                <button
+                  type="button"
+                  aria-label="Quitar logo"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    limpiarLogo();
+                  }}
+                  className="absolute top-1 right-1 z-20 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <span className="text-gray-400 text-xs text-center px-2 z-10 pointer-events-none">
+                Selecciona tu logo
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -52,6 +52,7 @@ export default function Header({ empresa, numero, fecha, tipoDocumento }) {
       lineHeight: 1.1,
     },
     docTitle: {
+      fontFamily: "Montserrat, sans-serif",
       fontSize: 28,
       fontWeight: 800,
       marginBottom: 2,

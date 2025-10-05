@@ -9,35 +9,44 @@ export default function FormularioCliente({ data = {}, onChange }) {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4">
-      <input
-        className={inputClass}
-        name="nombre"
-        placeholder="Ramón Manrique"
-        value={data.nombre || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        name="ruc"
-        placeholder="46420566"
-        value={data.ruc || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        name="direccion"
-        placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
-        value={data.direccion || ""}
-        onChange={handleInput}
-      />
-      <input
-        className={inputClass}
-        type="date"
-        name="fecha"
-        value={data.fecha || ""}
-        onChange={handleInput}
-      />
+    <div>
+      {/* 🟦 Línea superior + texto guía debajo */}
+      <div className="border-t pt-2 mb-4">
+        <p className="font-semibold text-sm">
+          Ingresa los datos del cliente que recibirá la proforma.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <input
+          className={inputClass}
+          name="nombre"
+          placeholder="Ramón Manrique"
+          value={data.nombre || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          name="ruc"
+          placeholder="46420566"
+          value={data.ruc || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          name="direccion"
+          placeholder="Jr. Alfonso Ugarte 392, Tarapoto"
+          value={data.direccion || ""}
+          onChange={handleInput}
+        />
+        <input
+          className={inputClass}
+          type="date"
+          name="fecha"
+          value={data.fecha || ""}
+          onChange={handleInput}
+        />
+      </div>
     </div>
   );
 }

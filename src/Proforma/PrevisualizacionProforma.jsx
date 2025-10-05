@@ -1,4 +1,3 @@
-// src/Proforma/PrevisualizacionProforma.jsx
 import React, { useMemo, useRef, useState } from "react";
 import { peekNextProformaNumber, getNextProformaNumber } from "../utils/numeracionProforma";
 
@@ -47,10 +46,8 @@ const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
       }
 
       if (hasTransparency) {
-        // 👉 Exportar como PNG para conservar transparencia
         resolve(canvas.toDataURL("image/png"));
       } else {
-        // 👉 Exportar como JPEG comprimido para ahorrar espacio
         resolve(canvas.toDataURL("image/jpeg", quality));
       }
     };
@@ -58,7 +55,14 @@ const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
     img.src = src;
   });
 
-const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }) => {
+const PrevisualizacionProforma = ({
+  cliente,
+  productos,
+  empresa,
+  tipoDocumento,
+  observaciones = "",
+  banco = {},
+}) => {
   const containerRef = useRef(null);
   const [generando, setGenerando] = useState(false);
   const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
@@ -89,12 +93,15 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }
       // 3️⃣ Capturamos el HTML limpio con imágenes embebidas
       const rawHTML = container.innerHTML;
 
+      // ✅ Aquí incluimos Montserrat en el HTML para Puppeteer
       const html = `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8" />
           <style>
+            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
             body {
               font-family: sans-serif;
               -webkit-print-color-adjust: exact;
@@ -102,9 +109,17 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }
               margin: 0;
               padding: 0;
             }
+
+            h1, h2, h3, .doc-title {
+              font-family: 'Montserrat', sans-serif;
+              font-weight: 800;
+              text-transform: uppercase;
+            }
+
             * {
               box-sizing: border-box;
             }
+
             img {
               max-width: 100%;
               height: auto;
@@ -147,7 +162,15 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }
   };
 
   return (
-    <div className="p-4">
+    <div>
+      {/* 🟦 Línea superior + microtexto */}
+      <div className="border-t pt-2 mb-4">
+        <p className="font-semibold text-sm">
+          Revisa que toda la información esté correcta antes de generar la proforma.
+        </p>
+      </div>
+
+      {/* 📄 Contenedor de la previsualización */}
       <div
         ref={containerRef}
         className="bg-white p-6 rounded-lg shadow max-w-[800px] mx-auto"
@@ -163,7 +186,7 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }
           <ProductoRow key={i} producto={p} formatMoney={formatMoney} />
         ))}
         <Totales productos={productos} formatMoney={formatMoney} />
-        <Footer />
+        <Footer empresa={empresa} observaciones={observaciones} banco={banco} />
       </div>
 
       {/* 📌 Botón de exportación */}

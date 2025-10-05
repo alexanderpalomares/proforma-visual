@@ -36,6 +36,7 @@ export default function ProductoRow({ producto, idx, formatMoney }) {
             minWidth: 280,
         },
         name: {
+            fontFamily: "Montserrat, sans-serif",
             fontWeight: 800,
             fontSize: 22,
             textTransform: "uppercase",

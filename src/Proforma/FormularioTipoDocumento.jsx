@@ -7,52 +7,32 @@ export default function FormularioTipoDocumento({ data = {}, onChange }) {
     onChange({ ...data, tipo });
   };
 
-  const styles = {
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "8px",
-      padding: "16px",
-      border: "1px solid #e5e7eb",
-      borderRadius: "8px",
-      backgroundColor: "#fff",
-    },
-    label: {
-      fontWeight: 600,
-      marginBottom: "4px",
-      fontSize: "14px",
-    },
-    options: {
-      display: "flex",
-      gap: "8px",
-    },
-    button: (active) => ({
-      flex: 1,
-      padding: "10px 16px",
-      borderRadius: "6px",
-      border: active ? "2px solid #2563eb" : "1px solid #d1d5db",
-      backgroundColor: active ? "#2563eb" : "#f9fafb",
-      color: active ? "#fff" : "#111",
-      fontWeight: active ? 700 : 500,
-      cursor: "pointer",
-      transition: "0.2s",
-    }),
-  };
-
   return (
-    <div style={styles.container}>
-      <label style={styles.label}>Selecciona el tipo de documento</label>
-      <div style={styles.options}>
-        {tipos.map((tipo) => (
-          <button
-            key={tipo}
-            style={styles.button(data.tipo === tipo)}
-            onClick={() => handleSelect(tipo)}
-            type="button"
-          >
-            {tipo}
-          </button>
-        ))}
+    <div>
+      {/* 🟦 Línea superior + microtexto */}
+      <div className="border-t pt-2 mb-4">
+        <p className="font-semibold text-sm">Elige el tipo de documento que deseas generar.</p>
+      </div>
+
+      {/* 🟢 Botones de selección */}
+      <div className="flex gap-2">
+        {tipos.map((tipo) => {
+          const active = data.tipo === tipo;
+          return (
+            <button
+              key={tipo}
+              type="button"
+              onClick={() => handleSelect(tipo)}
+              className={`flex-1 px-4 py-2 rounded-lg transition border ${
+                active
+                  ? "bg-blue-600 text-white font-bold border-blue-600"
+                  : "bg-gray-50 text-gray-800 font-medium border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {tipo}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
