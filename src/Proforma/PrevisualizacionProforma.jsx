@@ -58,7 +58,7 @@ const toDataURL = (src, maxWidth = 800, quality = 0.8) =>
     img.src = src;
   });
 
-const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
+const PrevisualizacionProforma = ({ cliente, productos, empresa, tipoDocumento }) => {
   const containerRef = useRef(null);
   const [generando, setGenerando] = useState(false);
   const proformaNumber = useMemo(() => peekNextProformaNumber(), []);
@@ -152,7 +152,12 @@ const PrevisualizacionProforma = ({ cliente, productos, empresa }) => {
         ref={containerRef}
         className="bg-white p-6 rounded-lg shadow max-w-[800px] mx-auto"
       >
-        <Header empresa={empresa} proformaNumber={proformaNumber} />
+        <Header
+          empresa={empresa}
+          numero={proformaNumber}
+          fecha={cliente?.fecha || "Fecha no registrada"}
+          tipoDocumento={tipoDocumento}
+        />
         <ClienteInfo cliente={cliente} />
         {productos.map((p, i) => (
           <ProductoRow key={i} producto={p} formatMoney={formatMoney} />
